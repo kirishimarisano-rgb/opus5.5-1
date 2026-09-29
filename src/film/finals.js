@@ -182,18 +182,18 @@ function buildKintsugi(R, W) {
 
 // ---- C: phyllotaxis ------------------------------------------------------------
 function buildSpiral(R) {
-  const n = 1100, GA = Math.PI * (3 - Math.sqrt(5));
+  const n = 520, GA = Math.PI * (3 - Math.sqrt(5));
   const l = [];
   const rnd = mulberry32(77);
   for (let i = 1; i < n; i++) {
-    const r = 0.0165 * Math.sqrt(i), a = i * GA;
+    const r = 0.024 * Math.sqrt(i), a = i * GA;
     const c = [r * Math.cos(a), r * Math.sin(a)];
     const hr = 0.0072 * (0.75 + 0.25 * Math.sqrt(i / n)) * (0.9 + 0.2 * rnd());
     const hex = G.hexOutline(c, hr, a);
     const f = i / n;
     // dithered transition gold → azure: the living centre is warm, the outer (older) ring cold
     const u = Math.min(1, Math.max(0, f + (rnd() - 0.5) * 0.3));
-    const tok = u < 0.62 ? T['gold-0'] + Math.min(0.999, u / 0.62) * 1.0 + (u > 0.45 ? 0 : 0) : T['azure-0'] + Math.min(0.999, (u - 0.62) / 0.38);
+    const tok = u < 0.62 ? T['gold-1'] + Math.min(0.999, u / 0.62) : T['azure-0'] + Math.min(0.999, (u - 0.62) / 0.38);
     for (let k = 0; k < 6; k++) l.push({ p0: hex[k], p1: hex[(k + 1) % 6], w: 0.0007, tok, glowR: 0.004, glowAmt: 0.4, alpha: (1 - 0.5 * f) * (0.55 + 0.45 * rnd()) });
   }
   return R.system('lines', { data: lineBuf(l), glsl: LINES_BASIC });
@@ -234,42 +234,41 @@ export function buildFinals(R, W) {
 
 const L_ALL = (i = 1, tok = -1, w = 1, g = 1, root = 1) => ({ uP0: [99, i, 0, tok], uP1: [w, g, root, 0] });
 
-export function finalDraws(F, W, which, time, { macro = false } = {}) {
+// Restraint defaults (checkpoint-1 feedback). Every switch here survived the deletion test;
+// see DIRECTOR_NOTES §11. `off` lets tools/deletion_test.mjs remove one effect at a time.
+export const KEEP = { dust: false, drift: false, blossom: false, halo: false, river: true, sap: true };
+export function finalDraws(F, W, which, time, { macro = false, off = null } = {}) {
+  const on = (k) => KEEP[k] && k !== off;
   const d = [];
+  const halo = on('halo') ? 1 : 0;
   const seedHexDraw = (M, i = 1, seam = true) => {
-    d.push({ sys: F.seed.fill, blend: 'over', u: { uModel: M, uP0: [0.6, 0, 0, 0], uEdgeTok: T['azure-0'], uSheen: 0.8 } });
-    d.push({ sys: F.seed.lines, blend: 'max', u: { uModel: M, ...L_ALL(i), uP1: [1, 1, 1, 0] }, count: seam ? undefined : 6 });
+    d.push({ sys: F.seed.fill, blend: 'over', u: { uModel: M, uP0: [0.35, 0, 0, 0], uEdgeTok: T['azure-0'], uSheen: 0.25 } });
+    d.push({ sys: F.seed.lines, blend: 'max', u: { uModel: M, ...L_ALL(i), uP1: [0.8, 0.25 * halo, 1, 0] }, count: seam ? undefined : 6 });
   };
-  d.push({ sys: F.dust, u: { uP0: [0.6, 0, 0, 0] } });
-  d.push({ sys: F.drift, blend: 'over', u: { uP0: [0.9, 0, 0, 0], uEdgeTok: T['azure-0'], uSheen: 0.6 } });
+  if (on('dust')) d.push({ sys: F.dust, u: { uP0: [0.6, 0, 0, 0] } });
+  if (on('drift')) d.push({ sys: F.drift, blend: 'over', u: { uP0: [0.9, 0, 0, 0], uEdgeTok: T['azure-0'], uSheen: 0.6 } });
+  // the current: 1/4 of the particles, only the brightest drawn (count), dim
+  if (on('river')) d.push({ sys: F.river, count: 10000, u: { uP0: [which === 'A' ? 0.55 : 0.3, 0, 0, 0] } });
   if (which === 'A') {
-    d.push({ sys: F.river, u: { uP0: [1.6, 0, 0, 0] } });
     const t = F.tree;
-    d.push({ sys: t.lines, blend: 'max', u: { ...L_ALL(0.75, T['gold-2'], 1.0, 1.0, 0.2) } });
-    d.push({ sys: t.lines, blend: 'max', u: { ...L_ALL(1.1, T['gold-0'], 0.4, 0.3, 0.2) } });
-    if (!macro) d.push({ sys: t.sapSys, u: { uNodes: { tex: t.nodeTex, unit: 3 }, uP0: [2.2, 0, 0, 0] } });
-    d.push({ sys: t.blossom, u: { uP0: [0.8, 0, 0, 0] } });
-    // seed at the root, 3.5° off its original orientation, scaled up so it reads
-    seedHexDraw(modelMat(0, HORIZON, 0.001, 0.061 + t.ang, t.sc), 1.3, false);
+    // lit brass filament: a narrow core, and (only because this is one of the two glow moments) a faint halo
+    d.push({ sys: t.lines, blend: 'max', u: { ...L_ALL(0.55, T['gold-1'], 0.75, 0.35 * halo, 0.12) } });
+    if (!macro && on('sap')) d.push({ sys: t.sapSys, count: 4000, u: { uNodes: { tex: t.nodeTex, unit: 3 }, uP0: [0.9, 0, 0, 0] } });
+    if (on('blossom')) d.push({ sys: t.blossom, u: { uP0: [0.8, 0, 0, 0] } });
+    seedHexDraw(modelMat(0, HORIZON, 0.001, 0.061 + t.ang, t.sc), 0.7, false);
   } else if (which === 'B') {
-    d.push({ sys: F.river, u: { uP0: [0.55, 0, 0, 0] } });
     const M = modelMat(0, 0.08, 0, 0.0, 1.12);
-    d.push({ sys: F.kin.flake, blend: 'max', u: { uModel: M, ...L_ALL(0.8) } });
-    d.push({ sys: F.kin.seam, blend: 'max', u: { uModel: M, ...L_ALL(1.0) } });
-    d.push({ sys: F.kin.seam, blend: 'max', u: { uModel: M, ...L_ALL(1.2, T['gold-0'], 0.45, 0.3) } });
+    d.push({ sys: F.kin.flake, blend: 'max', u: { uModel: M, ...L_ALL(0.32, -1, 0.8, 0.3 * halo) } });
+    d.push({ sys: F.kin.seam, blend: 'max', u: { uModel: M, ...L_ALL(0.6, T['gold-1'], 0.9, 0.35 * halo) } });
     const s = W.flake.seed;
-    const Ms = modelMat((s.c[0] + 0.004) * 1.12, 0.08 + (s.c[1] - 0.006) * 1.12, 0.001, 0.061, 1.12);
-    seedHexDraw(Ms, 1.2);
+    seedHexDraw(modelMat((s.c[0] + 0.004) * 1.12, 0.08 + (s.c[1] - 0.006) * 1.12, 0.001, 0.061, 1.12), 0.6);
   } else if (which === 'C') {
-    d.push({ sys: F.river, u: { uP0: [0.55, 0, 0, 0] } });
-    // disc tilted toward the camera, reads as a wide ellipse in 2.39
     const tilt = 1.12, c = Math.cos(tilt), s = Math.sin(tilt), k = 1.6;
     const M = [k, 0, 0, 0, 0, c * k, -s * k, 0, 0, s * k, c * k, 0, 0, -0.02, 0, 1];
-    d.push({ sys: F.spiral, blend: 'max', u: { uModel: M, ...L_ALL(0.9) } });
-    const Ms = [...M]; // seed at the very centre, slightly off-axis
+    d.push({ sys: F.spiral, blend: 'max', u: { uModel: M, ...L_ALL(0.4, -1, 0.8, 0.3 * halo) } });
     const r = 0.061, cr = Math.cos(r), sr = Math.sin(r), sc = 1.35;
     const R2 = [cr * sc * 0.8, sr * sc * 0.8, 0, 0, -sr * sc * 0.8, cr * sc * 0.8, 0, 0, 0, 0, sc, 0, 0.004, 0.002, 0.001, 1];
-    seedHexDraw(mulM(Ms, R2), 1.5);
+    seedHexDraw(mulM([...M], R2), 0.7);
   }
   return d;
 }

@@ -23,18 +23,18 @@ export const TOKENS = [
   ['ash-2',         '#4a4948', 'Dim ash.'],
   ['ash-3',         '#161616', 'Almost gone.'],
   // Act III — warm gold
-  ['gold-0',        '#ffecc8', 'Gold core (white-hot).'],
-  ['gold-1',        '#f5b04a', 'Gold.'],
-  ['gold-2',        '#d27a26', 'Deep gold.'],
-  ['gold-3',        '#6b3a0c', 'Gold shadow.'],
+  ['gold-0',        '#e6d3ab', 'Old-gold highlight (never white-hot).'],
+  ['gold-1',        '#b08a52', 'Old gold / brass.'],
+  ['gold-2',        '#7d6038', 'Tarnished brass.'],
+  ['gold-3',        '#35281a', 'Brass in shadow.'],
   // Act III climax — cold blue that coexists with gold
-  ['azure-0',       '#c6e2ff', 'Azure highlight.'],
-  ['azure-1',       '#4d9dff', 'Azure.'],
-  ['azure-2',       '#1a4d9e', 'Deep azure.'],
+  ['azure-0',       '#b4c8da', 'Azure highlight.'],
+  ['azure-1',       '#4f6f8f', 'Azure.'],
+  ['azure-2',       '#1c2c3e', 'Deep azure.'],
   // Typography
   ['text-ice',      '#dfe8ef', 'Subtitle 1.'],
   ['text-ash',      '#c2c1be', 'Subtitle 2.'],
-  ['text-gold',     '#f6dfae', 'Subtitle 3.'],
+  ['text-gold',     '#d9c7a0', 'Subtitle 3.'],
 ];
 
 export const TOKEN_INDEX = Object.fromEntries(TOKENS.map(([n], i) => [n, i]));

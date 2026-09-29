@@ -16,14 +16,14 @@ const CAMS = {
   B: { eye: [0, -0.26, 2.3], target: [0, 0.1, 0] },
   C: { eye: [0, -0.26, 2.3], target: [0, 0.02, 0] },
 };
-window.renderFinal = (which, time = 3.0, inset = null) => {
+window.renderFinal = (which, time = 3.0, inset = null, off = null) => {
   const c = CAMS[which];
   let eye = c.eye, target = c.target, fov = 30;
   if (inset) { target = inset; eye = [inset[0], inset[1] + 0.01, inset[2] + 0.35]; fov = 16; }
   const cam = camera({ eye, target, fovY: fov * Math.PI / 180, width: R.W, height: R.H });
-  const tex = R.renderView({ view: R.main, cam, clear: [0, 0, 0], draws: finalDraws(F, W, which, time, { macro: !!inset }), time });
+  const tex = R.renderView({ view: R.main, cam, clear: [0, 0, 0], draws: finalDraws(F, W, which, time, { macro: !!inset, off }), time });
   const lb = (H_ - W_ / 2.39) / 2;
-  R.finish(tex, { exposure: 1, bloom: 0.1, bloomThreshold: 0.9, sat: 1.15, vignette: 0.3, grain: 0.012, matte: inset ? [0, 0, W_, H_] : [0, lb, W_, H_ - lb] }, 1);
+  R.finish(tex, { exposure: 1, bloom: 0, bloomThreshold: 0.6, sat: 1.0, vignette: 0.0, grain: 0.008, matte: inset ? [0, 0, W_, H_] : [0, lb, W_, H_ - lb] }, 1);
   return R.canvas.toDataURL('image/png');
 };
 const sd = W.flake.seed.c;
