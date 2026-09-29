@@ -1,0 +1,3 @@
+music/*.wav
+node_modules/
+out/

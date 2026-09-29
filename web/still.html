@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>entropy still</title>
+<body style="margin:0;background:#000"><canvas id="c"></canvas>
+<script type="module">
+import { Renderer } from '../src/engine/renderer.js';
+import { camera } from '../src/engine/math.js';
+import { TOKEN_UNIFORM } from '../src/film/tokens.js';
+import { buildWorld } from '../src/film/world.js';
+import { buildFinals, finalDraws } from '../src/film/finals.js';
+const q = new URLSearchParams(location.search);
+const W_ = +(q.get('w') || 1920), H_ = +(q.get('h') || 1080), ss = +(q.get('ss') || 2);
+const R = new Renderer(document.getElementById('c'), { tokens: TOKEN_UNIFORM, outW: W_, outH: H_, ss, msaa: 4 });
+const W = buildWorld(R);
+const F = buildFinals(R, W);
+const CAMS = {
+  A: { eye: [0, -0.26, 2.3], target: [0, 0.08, 0], seed: [0, -0.3, 0] },
+  B: { eye: [0, -0.26, 2.3], target: [0, 0.1, 0] },
+  C: { eye: [0, -0.26, 2.3], target: [0, 0.02, 0] },
+};
+window.renderFinal = (which, time = 3.0, inset = null) => {
+  const c = CAMS[which];
+  let eye = c.eye, target = c.target, fov = 30;
+  if (inset) { target = inset; eye = [inset[0], inset[1] + 0.01, inset[2] + 0.35]; fov = 16; }
+  const cam = camera({ eye, target, fovY: fov * Math.PI / 180, width: R.W, height: R.H });
+  const tex = R.renderView({ view: R.main, cam, clear: [0, 0, 0], draws: finalDraws(F, W, which, time, { macro: !!inset }), time });
+  const lb = (H_ - W_ / 2.39) / 2;
+  R.finish(tex, { exposure: 1, bloom: 0.1, bloomThreshold: 0.9, sat: 1.15, vignette: 0.3, grain: 0.012, matte: inset ? [0, 0, W_, H_] : [0, lb, W_, H_ - lb] }, 1);
+  return R.canvas.toDataURL('image/png');
+};
+const sd = W.flake.seed.c;
+window.seedPos = { A: [0, -0.3, 0], B: [(sd[0] + 0.004) * 1.12, 0.08 + (sd[1] - 0.006) * 1.12, 0], C: [0.0, -0.02, 0] };
+window.ready = true;
+</script>

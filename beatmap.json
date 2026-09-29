@@ -1,0 +1,3228 @@
+{
+ "schema": "entropy-beatmap/1",
+ "source": "provisional — generated from src/film/structure.js (no score yet)",
+ "fps": 60,
+ "bpm": 72,
+ "meter": [
+  4,
+  4
+ ],
+ "frames_per_beat": 50,
+ "duration": {
+  "frame": 14400,
+  "time": 240
+ },
+ "acts": [
+  {
+   "act": 1,
+   "name": "秩序 Order",
+   "start": {
+    "frame": 0,
+    "time": 0
+   },
+   "end": {
+    "frame": 4800,
+    "time": 80
+   }
+  },
+  {
+   "act": 2,
+   "name": "崩解 Collapse",
+   "start": {
+    "frame": 4800,
+    "time": 80
+   },
+   "end": {
+    "frame": 8920,
+    "time": 148.666667
+   }
+  },
+  {
+   "act": 3,
+   "name": "重組 Reassembly",
+   "start": {
+    "frame": 8920,
+    "time": 148.666667
+   },
+   "end": {
+    "frame": 14400,
+    "time": 240
+   }
+  }
+ ],
+ "sections": [
+  {
+   "id": "I-a",
+   "act": 1,
+   "name": "起點 Genesis",
+   "bars": [
+    1,
+    4
+   ],
+   "start": {
+    "frame": 0,
+    "time": 0
+   },
+   "end": {
+    "frame": 800,
+    "time": 13.333333
+   },
+   "music": "Room tone; a lone music-box note at 2.1; glass harmonica drone fades in."
+  },
+  {
+   "id": "I-b",
+   "act": 1,
+   "name": "主題 Theme A",
+   "bars": [
+    5,
+    12
+   ],
+   "start": {
+    "frame": 800,
+    "time": 13.333333
+   },
+   "end": {
+    "frame": 2400,
+    "time": 40
+   },
+   "music": "Music box states the main theme (8 bars), pp–p."
+  },
+  {
+   "id": "I-c",
+   "act": 1,
+   "name": "結晶 Theme A′",
+   "bars": [
+    13,
+    20
+   ],
+   "start": {
+    "frame": 2400,
+    "time": 40
+   },
+   "end": {
+    "frame": 4000,
+    "time": 66.666667
+   },
+   "music": "Music box + glass harmonica counter-line, mp. Fullest, coldest beauty."
+  },
+  {
+   "id": "I-d",
+   "act": 1,
+   "name": "完滿 Perfection",
+   "bars": [
+    21,
+    24
+   ],
+   "start": {
+    "frame": 4000,
+    "time": 66.666667
+   },
+   "end": {
+    "frame": 4800,
+    "time": 80
+   },
+   "music": "Cadence and suspension; glass harmonica holds the tonic. Nothing moves."
+  },
+  {
+   "id": "II-a",
+   "act": 2,
+   "name": "偏移 The Slip",
+   "bars": [
+    25,
+    28
+   ],
+   "start": {
+    "frame": 4800,
+    "time": 80
+   },
+   "end": {
+    "frame": 5600,
+    "time": 93.333333
+   },
+   "music": "Theme restarts on music box — ONE note (the 3rd degree) 30–50 cents flat. It keeps drifting further out."
+  },
+  {
+   "id": "II-b",
+   "act": 2,
+   "name": "蔓延 Spread",
+   "bars": [
+    29,
+    32
+   ],
+   "start": {
+    "frame": 5600,
+    "time": 93.333333
+   },
+   "end": {
+    "frame": 6400,
+    "time": 106.666667
+   },
+   "music": "Prepared piano (muted, metallic), cello pizzicato walking bass; accelerating unease, crescendo."
+  },
+  {
+   "id": "II-c",
+   "act": 2,
+   "name": "抽空 Vacuum",
+   "bars": [
+    33,
+    33
+   ],
+   "start": {
+    "frame": 6400,
+    "time": 106.666667
+   },
+   "end": {
+    "frame": 6600,
+    "time": 110
+   },
+   "music": "SILENCE 1: everything cut at 33.1; a single inhaled breath / reversed swell may rise under −40 dBFS. No pulse."
+  },
+  {
+   "id": "II-d",
+   "act": 2,
+   "name": "重擊 Impact",
+   "bars": [
+    34,
+    35
+   ],
+   "start": {
+    "frame": 6600,
+    "time": 110
+   },
+   "end": {
+    "frame": 7000,
+    "time": 116.666667
+   },
+   "music": "TAIKO + low piano cluster on 34.1 (fff), long reverb tail; the tail IS the slow motion."
+  },
+  {
+   "id": "II-e",
+   "act": 2,
+   "name": "崩落 Collapse",
+   "bars": [
+    36,
+    41
+   ],
+   "start": {
+    "frame": 7000,
+    "time": 116.666667
+   },
+   "end": {
+    "frame": 8200,
+    "time": 136.666667
+   },
+   "music": "Taiko ostinato, cello pizz, prepared piano; decrescendo from bar 40."
+  },
+  {
+   "id": "II-f",
+   "act": 2,
+   "name": "散去 Dissolution",
+   "bars": [
+    42,
+    44
+   ],
+   "start": {
+    "frame": 8200,
+    "time": 136.666667
+   },
+   "end": {
+    "frame": 8800,
+    "time": 146.666667
+   },
+   "music": "Only the detuned music box, fragments of the theme, slowing and thinning to nothing by 44.4."
+  },
+  {
+   "id": "II-g",
+   "act": 2,
+   "name": "靜默 Silence",
+   "bars": null,
+   "start": {
+    "frame": 8800,
+    "time": 146.666667
+   },
+   "end": {
+    "frame": 8920,
+    "time": 148.666667
+   },
+   "music": "SILENCE 2: 2.0 s of absolute digital silence (fermata, off-grid)."
+  },
+  {
+   "id": "III-a",
+   "act": 3,
+   "name": "餘燼 Ember",
+   "bars": [
+    45,
+    48
+   ],
+   "start": {
+    "frame": 8920,
+    "time": 148.666667
+   },
+   "end": {
+    "frame": 9720,
+    "time": 162
+   },
+   "music": "A single erhu note, ppp, rising out of the silence on 45.1."
+  },
+  {
+   "id": "III-b",
+   "act": 3,
+   "name": "逆流 Upstream",
+   "bars": [
+    49,
+    56
+   ],
+   "start": {
+    "frame": 9720,
+    "time": 162
+   },
+   "end": {
+    "frame": 11320,
+    "time": 188.666667
+   },
+   "music": "Erhu plays the main theme (same melody as Act I); cello arco from bar 53."
+  },
+  {
+   "id": "III-c",
+   "act": 3,
+   "name": "生長 Growth",
+   "bars": [
+    57,
+    62
+   ],
+   "start": {
+    "frame": 11320,
+    "time": 188.666667
+   },
+   "end": {
+    "frame": 12520,
+    "time": 208.666667
+   },
+   "music": "Strings enter, choir hums (closed mouth); crescendo."
+  },
+  {
+   "id": "III-d",
+   "act": 3,
+   "name": "吸氣 Inhale",
+   "bars": [
+    63,
+    63
+   ],
+   "start": {
+    "frame": 12520,
+    "time": 208.666667
+   },
+   "end": {
+    "frame": 12720,
+    "time": 212
+   },
+   "music": "One-bar swell: strings & choir crescendo into 64.1 (not silence — a held breath)."
+  },
+  {
+   "id": "III-e",
+   "act": 3,
+   "name": "高潮 Climax",
+   "bars": [
+    64,
+    69
+   ],
+   "start": {
+    "frame": 12720,
+    "time": 212
+   },
+   "end": {
+    "frame": 13920,
+    "time": 232
+   },
+   "music": "Full choir (open vowel), strings, erhu on the theme, taiko returns as a heartbeat (beats 1 & 3)."
+  },
+  {
+   "id": "III-f",
+   "act": 3,
+   "name": "尾聲 Coda",
+   "bars": [
+    70,
+    71
+   ],
+   "start": {
+    "frame": 13920,
+    "time": 232
+   },
+   "end": {
+    "frame": 14400,
+    "time": 240
+   },
+   "music": "Orchestra drops out on 70.1; music box plays the theme's first phrase — in tune, except the same one note, still flat. Last note rings into black."
+  }
+ ],
+ "hits": [
+  {
+   "id": "first-light",
+   "bar": 2,
+   "beat": 1,
+   "frame": 200,
+   "time": 3.333333,
+   "desc": "First music-box note — a single point of light appears."
+  },
+  {
+   "id": "pane-open",
+   "bar": 3,
+   "beat": 1,
+   "frame": 400,
+   "time": 6.666667,
+   "desc": "The 1:1 pane begins to lighten around the point."
+  },
+  {
+   "id": "theme-a",
+   "bar": 5,
+   "beat": 1,
+   "frame": 800,
+   "time": 13.333333,
+   "desc": "Theme A begins — snowflake growth locked to melody notes."
+  },
+  {
+   "id": "theme-a2",
+   "bar": 13,
+   "beat": 1,
+   "frame": 2400,
+   "time": 40,
+   "desc": "Theme A′ — camera begins the push into self-similar detail."
+  },
+  {
+   "id": "perfection",
+   "bar": 21,
+   "beat": 1,
+   "frame": 4000,
+   "time": 66.666667,
+   "desc": "Full crystal revealed; camera settles."
+  },
+  {
+   "id": "slip",
+   "bar": 25,
+   "beat": 1,
+   "frame": 4800,
+   "time": 80,
+   "desc": "THE SLIP — first displaced element (seed hex) shifts on the first detuned note."
+  },
+  {
+   "id": "crack-born",
+   "bar": 26,
+   "beat": 1,
+   "frame": 5000,
+   "time": 83.333333,
+   "desc": "Orange-red crack emerges from the seed hex (the only foreign colour)."
+  },
+  {
+   "id": "spread",
+   "bar": 29,
+   "beat": 1,
+   "frame": 5600,
+   "time": 93.333333,
+   "desc": "Prepared piano enters — crack branches multiply."
+  },
+  {
+   "id": "vacuum",
+   "bar": 33,
+   "beat": 1,
+   "frame": 6400,
+   "time": 106.666667,
+   "desc": "SILENCE 1 begins — time remap drops to ~0.03×."
+  },
+  {
+   "id": "impact",
+   "bar": 34,
+   "beat": 1,
+   "frame": 6600,
+   "time": 110,
+   "desc": "IMPACT — the 1:1 frame itself shatters into full 16:9."
+  },
+  {
+   "id": "real-time",
+   "bar": 36,
+   "beat": 1,
+   "frame": 7000,
+   "time": 116.666667,
+   "desc": "Slow motion releases back to 1×."
+  },
+  {
+   "id": "decay",
+   "bar": 40,
+   "beat": 1,
+   "frame": 7800,
+   "time": 130,
+   "desc": "Orange-red extinguished; desaturation completes by 42.1."
+  },
+  {
+   "id": "dissolve",
+   "bar": 42,
+   "beat": 1,
+   "frame": 8200,
+   "time": 136.666667,
+   "desc": "Shards have become dust; near black-and-white."
+  },
+  {
+   "id": "silence-2",
+   "bar": 44,
+   "beat": 5,
+   "frame": 8800,
+   "time": 146.666667,
+   "desc": "SILENCE 2 begins (end of bar 44)."
+  },
+  {
+   "id": "ember",
+   "bar": 45,
+   "beat": 1,
+   "frame": 8920,
+   "time": 148.666667,
+   "desc": "Silence ends — erhu; the seed hex is the first thing to light (gold)."
+  },
+  {
+   "id": "upstream",
+   "bar": 49,
+   "beat": 1,
+   "frame": 9720,
+   "time": 162,
+   "desc": "Dust reverses and flows toward the seed."
+  },
+  {
+   "id": "sprout",
+   "bar": 53,
+   "beat": 1,
+   "frame": 10520,
+   "time": 175.333333,
+   "desc": "First gold branch leaves the seed."
+  },
+  {
+   "id": "growth",
+   "bar": 57,
+   "beat": 1,
+   "frame": 11320,
+   "time": 188.666667,
+   "desc": "Growth — cold blue returns as a second light."
+  },
+  {
+   "id": "inhale",
+   "bar": 63,
+   "beat": 1,
+   "frame": 12520,
+   "time": 208.666667,
+   "desc": "The picture draws in to a horizon line."
+  },
+  {
+   "id": "climax",
+   "bar": 64,
+   "beat": 1,
+   "frame": 12720,
+   "time": 212,
+   "desc": "CLIMAX — the frame opens to 2.39:1; highest saturation."
+  },
+  {
+   "id": "coda",
+   "bar": 70,
+   "beat": 1,
+   "frame": 13920,
+   "time": 232,
+   "desc": "Coda — push in to the retained crack."
+  },
+  {
+   "id": "last-note",
+   "bar": 71,
+   "beat": 3,
+   "frame": 14220,
+   "time": 237,
+   "desc": "Final music-box note; fade to black over its decay."
+  }
+ ],
+ "silences": [
+  {
+   "id": "vacuum",
+   "kind": "near-silence (≤ −40 dBFS, no pulse)",
+   "start": {
+    "frame": 6400,
+    "time": 106.666667
+   },
+   "end": {
+    "frame": 6600,
+    "time": 110
+   }
+  },
+  {
+   "id": "silence-2",
+   "kind": "absolute digital silence",
+   "start": {
+    "frame": 8800,
+    "time": 146.666667
+   },
+   "end": {
+    "frame": 8920,
+    "time": 148.666667
+   }
+  }
+ ],
+ "subtitles": [
+  {
+   "text": "一切，從秩序開始。",
+   "start": {
+    "frame": 800,
+    "time": 13.333333
+   },
+   "end": {
+    "frame": 1400,
+    "time": 23.333333
+   }
+  },
+  {
+   "text": "萬物終將散去。",
+   "start": {
+    "frame": 8200,
+    "time": 136.666667
+   },
+   "end": {
+    "frame": 8700,
+    "time": 145
+   }
+  },
+  {
+   "text": "但生命，選擇逆流。",
+   "start": {
+    "frame": 9320,
+    "time": 155.333333
+   },
+   "end": {
+    "frame": 9920,
+    "time": 165.333333
+   }
+  }
+ ],
+ "downbeats": [
+  {
+   "bar": 1,
+   "frame": 0,
+   "time": 0
+  },
+  {
+   "bar": 2,
+   "frame": 200,
+   "time": 3.333333
+  },
+  {
+   "bar": 3,
+   "frame": 400,
+   "time": 6.666667
+  },
+  {
+   "bar": 4,
+   "frame": 600,
+   "time": 10
+  },
+  {
+   "bar": 5,
+   "frame": 800,
+   "time": 13.333333
+  },
+  {
+   "bar": 6,
+   "frame": 1000,
+   "time": 16.666667
+  },
+  {
+   "bar": 7,
+   "frame": 1200,
+   "time": 20
+  },
+  {
+   "bar": 8,
+   "frame": 1400,
+   "time": 23.333333
+  },
+  {
+   "bar": 9,
+   "frame": 1600,
+   "time": 26.666667
+  },
+  {
+   "bar": 10,
+   "frame": 1800,
+   "time": 30
+  },
+  {
+   "bar": 11,
+   "frame": 2000,
+   "time": 33.333333
+  },
+  {
+   "bar": 12,
+   "frame": 2200,
+   "time": 36.666667
+  },
+  {
+   "bar": 13,
+   "frame": 2400,
+   "time": 40
+  },
+  {
+   "bar": 14,
+   "frame": 2600,
+   "time": 43.333333
+  },
+  {
+   "bar": 15,
+   "frame": 2800,
+   "time": 46.666667
+  },
+  {
+   "bar": 16,
+   "frame": 3000,
+   "time": 50
+  },
+  {
+   "bar": 17,
+   "frame": 3200,
+   "time": 53.333333
+  },
+  {
+   "bar": 18,
+   "frame": 3400,
+   "time": 56.666667
+  },
+  {
+   "bar": 19,
+   "frame": 3600,
+   "time": 60
+  },
+  {
+   "bar": 20,
+   "frame": 3800,
+   "time": 63.333333
+  },
+  {
+   "bar": 21,
+   "frame": 4000,
+   "time": 66.666667
+  },
+  {
+   "bar": 22,
+   "frame": 4200,
+   "time": 70
+  },
+  {
+   "bar": 23,
+   "frame": 4400,
+   "time": 73.333333
+  },
+  {
+   "bar": 24,
+   "frame": 4600,
+   "time": 76.666667
+  },
+  {
+   "bar": 25,
+   "frame": 4800,
+   "time": 80
+  },
+  {
+   "bar": 26,
+   "frame": 5000,
+   "time": 83.333333
+  },
+  {
+   "bar": 27,
+   "frame": 5200,
+   "time": 86.666667
+  },
+  {
+   "bar": 28,
+   "frame": 5400,
+   "time": 90
+  },
+  {
+   "bar": 29,
+   "frame": 5600,
+   "time": 93.333333
+  },
+  {
+   "bar": 30,
+   "frame": 5800,
+   "time": 96.666667
+  },
+  {
+   "bar": 31,
+   "frame": 6000,
+   "time": 100
+  },
+  {
+   "bar": 32,
+   "frame": 6200,
+   "time": 103.333333
+  },
+  {
+   "bar": 33,
+   "frame": 6400,
+   "time": 106.666667
+  },
+  {
+   "bar": 34,
+   "frame": 6600,
+   "time": 110
+  },
+  {
+   "bar": 35,
+   "frame": 6800,
+   "time": 113.333333
+  },
+  {
+   "bar": 36,
+   "frame": 7000,
+   "time": 116.666667
+  },
+  {
+   "bar": 37,
+   "frame": 7200,
+   "time": 120
+  },
+  {
+   "bar": 38,
+   "frame": 7400,
+   "time": 123.333333
+  },
+  {
+   "bar": 39,
+   "frame": 7600,
+   "time": 126.666667
+  },
+  {
+   "bar": 40,
+   "frame": 7800,
+   "time": 130
+  },
+  {
+   "bar": 41,
+   "frame": 8000,
+   "time": 133.333333
+  },
+  {
+   "bar": 42,
+   "frame": 8200,
+   "time": 136.666667
+  },
+  {
+   "bar": 43,
+   "frame": 8400,
+   "time": 140
+  },
+  {
+   "bar": 44,
+   "frame": 8600,
+   "time": 143.333333
+  },
+  {
+   "bar": 45,
+   "frame": 8920,
+   "time": 148.666667
+  },
+  {
+   "bar": 46,
+   "frame": 9120,
+   "time": 152
+  },
+  {
+   "bar": 47,
+   "frame": 9320,
+   "time": 155.333333
+  },
+  {
+   "bar": 48,
+   "frame": 9520,
+   "time": 158.666667
+  },
+  {
+   "bar": 49,
+   "frame": 9720,
+   "time": 162
+  },
+  {
+   "bar": 50,
+   "frame": 9920,
+   "time": 165.333333
+  },
+  {
+   "bar": 51,
+   "frame": 10120,
+   "time": 168.666667
+  },
+  {
+   "bar": 52,
+   "frame": 10320,
+   "time": 172
+  },
+  {
+   "bar": 53,
+   "frame": 10520,
+   "time": 175.333333
+  },
+  {
+   "bar": 54,
+   "frame": 10720,
+   "time": 178.666667
+  },
+  {
+   "bar": 55,
+   "frame": 10920,
+   "time": 182
+  },
+  {
+   "bar": 56,
+   "frame": 11120,
+   "time": 185.333333
+  },
+  {
+   "bar": 57,
+   "frame": 11320,
+   "time": 188.666667
+  },
+  {
+   "bar": 58,
+   "frame": 11520,
+   "time": 192
+  },
+  {
+   "bar": 59,
+   "frame": 11720,
+   "time": 195.333333
+  },
+  {
+   "bar": 60,
+   "frame": 11920,
+   "time": 198.666667
+  },
+  {
+   "bar": 61,
+   "frame": 12120,
+   "time": 202
+  },
+  {
+   "bar": 62,
+   "frame": 12320,
+   "time": 205.333333
+  },
+  {
+   "bar": 63,
+   "frame": 12520,
+   "time": 208.666667
+  },
+  {
+   "bar": 64,
+   "frame": 12720,
+   "time": 212
+  },
+  {
+   "bar": 65,
+   "frame": 12920,
+   "time": 215.333333
+  },
+  {
+   "bar": 66,
+   "frame": 13120,
+   "time": 218.666667
+  },
+  {
+   "bar": 67,
+   "frame": 13320,
+   "time": 222
+  },
+  {
+   "bar": 68,
+   "frame": 13520,
+   "time": 225.333333
+  },
+  {
+   "bar": 69,
+   "frame": 13720,
+   "time": 228.666667
+  },
+  {
+   "bar": 70,
+   "frame": 13920,
+   "time": 232
+  },
+  {
+   "bar": 71,
+   "frame": 14120,
+   "time": 235.333333
+  }
+ ],
+ "beats": [
+  {
+   "bar": 1,
+   "beat": 1,
+   "frame": 0,
+   "time": 0,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 1,
+   "beat": 2,
+   "frame": 50,
+   "time": 0.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 1,
+   "beat": 3,
+   "frame": 100,
+   "time": 1.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 1,
+   "beat": 4,
+   "frame": 150,
+   "time": 2.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 2,
+   "beat": 1,
+   "frame": 200,
+   "time": 3.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 2,
+   "beat": 2,
+   "frame": 250,
+   "time": 4.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 2,
+   "beat": 3,
+   "frame": 300,
+   "time": 5,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 2,
+   "beat": 4,
+   "frame": 350,
+   "time": 5.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 3,
+   "beat": 1,
+   "frame": 400,
+   "time": 6.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 3,
+   "beat": 2,
+   "frame": 450,
+   "time": 7.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 3,
+   "beat": 3,
+   "frame": 500,
+   "time": 8.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 3,
+   "beat": 4,
+   "frame": 550,
+   "time": 9.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 4,
+   "beat": 1,
+   "frame": 600,
+   "time": 10,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 4,
+   "beat": 2,
+   "frame": 650,
+   "time": 10.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 4,
+   "beat": 3,
+   "frame": 700,
+   "time": 11.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 4,
+   "beat": 4,
+   "frame": 750,
+   "time": 12.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 5,
+   "beat": 1,
+   "frame": 800,
+   "time": 13.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 5,
+   "beat": 2,
+   "frame": 850,
+   "time": 14.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 5,
+   "beat": 3,
+   "frame": 900,
+   "time": 15,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 5,
+   "beat": 4,
+   "frame": 950,
+   "time": 15.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 6,
+   "beat": 1,
+   "frame": 1000,
+   "time": 16.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 6,
+   "beat": 2,
+   "frame": 1050,
+   "time": 17.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 6,
+   "beat": 3,
+   "frame": 1100,
+   "time": 18.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 6,
+   "beat": 4,
+   "frame": 1150,
+   "time": 19.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 7,
+   "beat": 1,
+   "frame": 1200,
+   "time": 20,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 7,
+   "beat": 2,
+   "frame": 1250,
+   "time": 20.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 7,
+   "beat": 3,
+   "frame": 1300,
+   "time": 21.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 7,
+   "beat": 4,
+   "frame": 1350,
+   "time": 22.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 8,
+   "beat": 1,
+   "frame": 1400,
+   "time": 23.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 8,
+   "beat": 2,
+   "frame": 1450,
+   "time": 24.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 8,
+   "beat": 3,
+   "frame": 1500,
+   "time": 25,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 8,
+   "beat": 4,
+   "frame": 1550,
+   "time": 25.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 9,
+   "beat": 1,
+   "frame": 1600,
+   "time": 26.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 9,
+   "beat": 2,
+   "frame": 1650,
+   "time": 27.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 9,
+   "beat": 3,
+   "frame": 1700,
+   "time": 28.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 9,
+   "beat": 4,
+   "frame": 1750,
+   "time": 29.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 10,
+   "beat": 1,
+   "frame": 1800,
+   "time": 30,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 10,
+   "beat": 2,
+   "frame": 1850,
+   "time": 30.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 10,
+   "beat": 3,
+   "frame": 1900,
+   "time": 31.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 10,
+   "beat": 4,
+   "frame": 1950,
+   "time": 32.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 11,
+   "beat": 1,
+   "frame": 2000,
+   "time": 33.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 11,
+   "beat": 2,
+   "frame": 2050,
+   "time": 34.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 11,
+   "beat": 3,
+   "frame": 2100,
+   "time": 35,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 11,
+   "beat": 4,
+   "frame": 2150,
+   "time": 35.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 12,
+   "beat": 1,
+   "frame": 2200,
+   "time": 36.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 12,
+   "beat": 2,
+   "frame": 2250,
+   "time": 37.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 12,
+   "beat": 3,
+   "frame": 2300,
+   "time": 38.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 12,
+   "beat": 4,
+   "frame": 2350,
+   "time": 39.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 13,
+   "beat": 1,
+   "frame": 2400,
+   "time": 40,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 13,
+   "beat": 2,
+   "frame": 2450,
+   "time": 40.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 13,
+   "beat": 3,
+   "frame": 2500,
+   "time": 41.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 13,
+   "beat": 4,
+   "frame": 2550,
+   "time": 42.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 14,
+   "beat": 1,
+   "frame": 2600,
+   "time": 43.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 14,
+   "beat": 2,
+   "frame": 2650,
+   "time": 44.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 14,
+   "beat": 3,
+   "frame": 2700,
+   "time": 45,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 14,
+   "beat": 4,
+   "frame": 2750,
+   "time": 45.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 15,
+   "beat": 1,
+   "frame": 2800,
+   "time": 46.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 15,
+   "beat": 2,
+   "frame": 2850,
+   "time": 47.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 15,
+   "beat": 3,
+   "frame": 2900,
+   "time": 48.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 15,
+   "beat": 4,
+   "frame": 2950,
+   "time": 49.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 16,
+   "beat": 1,
+   "frame": 3000,
+   "time": 50,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 16,
+   "beat": 2,
+   "frame": 3050,
+   "time": 50.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 16,
+   "beat": 3,
+   "frame": 3100,
+   "time": 51.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 16,
+   "beat": 4,
+   "frame": 3150,
+   "time": 52.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 17,
+   "beat": 1,
+   "frame": 3200,
+   "time": 53.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 17,
+   "beat": 2,
+   "frame": 3250,
+   "time": 54.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 17,
+   "beat": 3,
+   "frame": 3300,
+   "time": 55,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 17,
+   "beat": 4,
+   "frame": 3350,
+   "time": 55.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 18,
+   "beat": 1,
+   "frame": 3400,
+   "time": 56.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 18,
+   "beat": 2,
+   "frame": 3450,
+   "time": 57.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 18,
+   "beat": 3,
+   "frame": 3500,
+   "time": 58.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 18,
+   "beat": 4,
+   "frame": 3550,
+   "time": 59.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 19,
+   "beat": 1,
+   "frame": 3600,
+   "time": 60,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 19,
+   "beat": 2,
+   "frame": 3650,
+   "time": 60.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 19,
+   "beat": 3,
+   "frame": 3700,
+   "time": 61.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 19,
+   "beat": 4,
+   "frame": 3750,
+   "time": 62.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 20,
+   "beat": 1,
+   "frame": 3800,
+   "time": 63.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 20,
+   "beat": 2,
+   "frame": 3850,
+   "time": 64.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 20,
+   "beat": 3,
+   "frame": 3900,
+   "time": 65,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 20,
+   "beat": 4,
+   "frame": 3950,
+   "time": 65.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 21,
+   "beat": 1,
+   "frame": 4000,
+   "time": 66.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 21,
+   "beat": 2,
+   "frame": 4050,
+   "time": 67.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 21,
+   "beat": 3,
+   "frame": 4100,
+   "time": 68.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 21,
+   "beat": 4,
+   "frame": 4150,
+   "time": 69.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 22,
+   "beat": 1,
+   "frame": 4200,
+   "time": 70,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 22,
+   "beat": 2,
+   "frame": 4250,
+   "time": 70.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 22,
+   "beat": 3,
+   "frame": 4300,
+   "time": 71.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 22,
+   "beat": 4,
+   "frame": 4350,
+   "time": 72.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 23,
+   "beat": 1,
+   "frame": 4400,
+   "time": 73.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 23,
+   "beat": 2,
+   "frame": 4450,
+   "time": 74.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 23,
+   "beat": 3,
+   "frame": 4500,
+   "time": 75,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 23,
+   "beat": 4,
+   "frame": 4550,
+   "time": 75.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 24,
+   "beat": 1,
+   "frame": 4600,
+   "time": 76.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 24,
+   "beat": 2,
+   "frame": 4650,
+   "time": 77.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 24,
+   "beat": 3,
+   "frame": 4700,
+   "time": 78.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 24,
+   "beat": 4,
+   "frame": 4750,
+   "time": 79.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 25,
+   "beat": 1,
+   "frame": 4800,
+   "time": 80,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 25,
+   "beat": 2,
+   "frame": 4850,
+   "time": 80.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 25,
+   "beat": 3,
+   "frame": 4900,
+   "time": 81.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 25,
+   "beat": 4,
+   "frame": 4950,
+   "time": 82.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 26,
+   "beat": 1,
+   "frame": 5000,
+   "time": 83.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 26,
+   "beat": 2,
+   "frame": 5050,
+   "time": 84.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 26,
+   "beat": 3,
+   "frame": 5100,
+   "time": 85,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 26,
+   "beat": 4,
+   "frame": 5150,
+   "time": 85.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 27,
+   "beat": 1,
+   "frame": 5200,
+   "time": 86.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 27,
+   "beat": 2,
+   "frame": 5250,
+   "time": 87.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 27,
+   "beat": 3,
+   "frame": 5300,
+   "time": 88.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 27,
+   "beat": 4,
+   "frame": 5350,
+   "time": 89.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 28,
+   "beat": 1,
+   "frame": 5400,
+   "time": 90,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 28,
+   "beat": 2,
+   "frame": 5450,
+   "time": 90.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 28,
+   "beat": 3,
+   "frame": 5500,
+   "time": 91.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 28,
+   "beat": 4,
+   "frame": 5550,
+   "time": 92.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 29,
+   "beat": 1,
+   "frame": 5600,
+   "time": 93.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 29,
+   "beat": 2,
+   "frame": 5650,
+   "time": 94.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 29,
+   "beat": 3,
+   "frame": 5700,
+   "time": 95,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 29,
+   "beat": 4,
+   "frame": 5750,
+   "time": 95.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 30,
+   "beat": 1,
+   "frame": 5800,
+   "time": 96.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 30,
+   "beat": 2,
+   "frame": 5850,
+   "time": 97.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 30,
+   "beat": 3,
+   "frame": 5900,
+   "time": 98.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 30,
+   "beat": 4,
+   "frame": 5950,
+   "time": 99.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 31,
+   "beat": 1,
+   "frame": 6000,
+   "time": 100,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 31,
+   "beat": 2,
+   "frame": 6050,
+   "time": 100.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 31,
+   "beat": 3,
+   "frame": 6100,
+   "time": 101.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 31,
+   "beat": 4,
+   "frame": 6150,
+   "time": 102.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 32,
+   "beat": 1,
+   "frame": 6200,
+   "time": 103.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 32,
+   "beat": 2,
+   "frame": 6250,
+   "time": 104.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 32,
+   "beat": 3,
+   "frame": 6300,
+   "time": 105,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 32,
+   "beat": 4,
+   "frame": 6350,
+   "time": 105.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 33,
+   "beat": 1,
+   "frame": 6400,
+   "time": 106.666667,
+   "strength": 1,
+   "audible": false
+  },
+  {
+   "bar": 33,
+   "beat": 2,
+   "frame": 6450,
+   "time": 107.5,
+   "strength": 0.3,
+   "audible": false
+  },
+  {
+   "bar": 33,
+   "beat": 3,
+   "frame": 6500,
+   "time": 108.333333,
+   "strength": 0.6,
+   "audible": false
+  },
+  {
+   "bar": 33,
+   "beat": 4,
+   "frame": 6550,
+   "time": 109.166667,
+   "strength": 0.3,
+   "audible": false
+  },
+  {
+   "bar": 34,
+   "beat": 1,
+   "frame": 6600,
+   "time": 110,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 34,
+   "beat": 2,
+   "frame": 6650,
+   "time": 110.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 34,
+   "beat": 3,
+   "frame": 6700,
+   "time": 111.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 34,
+   "beat": 4,
+   "frame": 6750,
+   "time": 112.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 35,
+   "beat": 1,
+   "frame": 6800,
+   "time": 113.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 35,
+   "beat": 2,
+   "frame": 6850,
+   "time": 114.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 35,
+   "beat": 3,
+   "frame": 6900,
+   "time": 115,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 35,
+   "beat": 4,
+   "frame": 6950,
+   "time": 115.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 36,
+   "beat": 1,
+   "frame": 7000,
+   "time": 116.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 36,
+   "beat": 2,
+   "frame": 7050,
+   "time": 117.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 36,
+   "beat": 3,
+   "frame": 7100,
+   "time": 118.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 36,
+   "beat": 4,
+   "frame": 7150,
+   "time": 119.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 37,
+   "beat": 1,
+   "frame": 7200,
+   "time": 120,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 37,
+   "beat": 2,
+   "frame": 7250,
+   "time": 120.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 37,
+   "beat": 3,
+   "frame": 7300,
+   "time": 121.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 37,
+   "beat": 4,
+   "frame": 7350,
+   "time": 122.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 38,
+   "beat": 1,
+   "frame": 7400,
+   "time": 123.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 38,
+   "beat": 2,
+   "frame": 7450,
+   "time": 124.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 38,
+   "beat": 3,
+   "frame": 7500,
+   "time": 125,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 38,
+   "beat": 4,
+   "frame": 7550,
+   "time": 125.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 39,
+   "beat": 1,
+   "frame": 7600,
+   "time": 126.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 39,
+   "beat": 2,
+   "frame": 7650,
+   "time": 127.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 39,
+   "beat": 3,
+   "frame": 7700,
+   "time": 128.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 39,
+   "beat": 4,
+   "frame": 7750,
+   "time": 129.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 40,
+   "beat": 1,
+   "frame": 7800,
+   "time": 130,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 40,
+   "beat": 2,
+   "frame": 7850,
+   "time": 130.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 40,
+   "beat": 3,
+   "frame": 7900,
+   "time": 131.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 40,
+   "beat": 4,
+   "frame": 7950,
+   "time": 132.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 41,
+   "beat": 1,
+   "frame": 8000,
+   "time": 133.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 41,
+   "beat": 2,
+   "frame": 8050,
+   "time": 134.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 41,
+   "beat": 3,
+   "frame": 8100,
+   "time": 135,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 41,
+   "beat": 4,
+   "frame": 8150,
+   "time": 135.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 42,
+   "beat": 1,
+   "frame": 8200,
+   "time": 136.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 42,
+   "beat": 2,
+   "frame": 8250,
+   "time": 137.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 42,
+   "beat": 3,
+   "frame": 8300,
+   "time": 138.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 42,
+   "beat": 4,
+   "frame": 8350,
+   "time": 139.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 43,
+   "beat": 1,
+   "frame": 8400,
+   "time": 140,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 43,
+   "beat": 2,
+   "frame": 8450,
+   "time": 140.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 43,
+   "beat": 3,
+   "frame": 8500,
+   "time": 141.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 43,
+   "beat": 4,
+   "frame": 8550,
+   "time": 142.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 44,
+   "beat": 1,
+   "frame": 8600,
+   "time": 143.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 44,
+   "beat": 2,
+   "frame": 8650,
+   "time": 144.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 44,
+   "beat": 3,
+   "frame": 8700,
+   "time": 145,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 44,
+   "beat": 4,
+   "frame": 8750,
+   "time": 145.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 45,
+   "beat": 1,
+   "frame": 8920,
+   "time": 148.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 45,
+   "beat": 2,
+   "frame": 8970,
+   "time": 149.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 45,
+   "beat": 3,
+   "frame": 9020,
+   "time": 150.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 45,
+   "beat": 4,
+   "frame": 9070,
+   "time": 151.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 46,
+   "beat": 1,
+   "frame": 9120,
+   "time": 152,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 46,
+   "beat": 2,
+   "frame": 9170,
+   "time": 152.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 46,
+   "beat": 3,
+   "frame": 9220,
+   "time": 153.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 46,
+   "beat": 4,
+   "frame": 9270,
+   "time": 154.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 47,
+   "beat": 1,
+   "frame": 9320,
+   "time": 155.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 47,
+   "beat": 2,
+   "frame": 9370,
+   "time": 156.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 47,
+   "beat": 3,
+   "frame": 9420,
+   "time": 157,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 47,
+   "beat": 4,
+   "frame": 9470,
+   "time": 157.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 48,
+   "beat": 1,
+   "frame": 9520,
+   "time": 158.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 48,
+   "beat": 2,
+   "frame": 9570,
+   "time": 159.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 48,
+   "beat": 3,
+   "frame": 9620,
+   "time": 160.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 48,
+   "beat": 4,
+   "frame": 9670,
+   "time": 161.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 49,
+   "beat": 1,
+   "frame": 9720,
+   "time": 162,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 49,
+   "beat": 2,
+   "frame": 9770,
+   "time": 162.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 49,
+   "beat": 3,
+   "frame": 9820,
+   "time": 163.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 49,
+   "beat": 4,
+   "frame": 9870,
+   "time": 164.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 50,
+   "beat": 1,
+   "frame": 9920,
+   "time": 165.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 50,
+   "beat": 2,
+   "frame": 9970,
+   "time": 166.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 50,
+   "beat": 3,
+   "frame": 10020,
+   "time": 167,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 50,
+   "beat": 4,
+   "frame": 10070,
+   "time": 167.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 51,
+   "beat": 1,
+   "frame": 10120,
+   "time": 168.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 51,
+   "beat": 2,
+   "frame": 10170,
+   "time": 169.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 51,
+   "beat": 3,
+   "frame": 10220,
+   "time": 170.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 51,
+   "beat": 4,
+   "frame": 10270,
+   "time": 171.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 52,
+   "beat": 1,
+   "frame": 10320,
+   "time": 172,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 52,
+   "beat": 2,
+   "frame": 10370,
+   "time": 172.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 52,
+   "beat": 3,
+   "frame": 10420,
+   "time": 173.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 52,
+   "beat": 4,
+   "frame": 10470,
+   "time": 174.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 53,
+   "beat": 1,
+   "frame": 10520,
+   "time": 175.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 53,
+   "beat": 2,
+   "frame": 10570,
+   "time": 176.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 53,
+   "beat": 3,
+   "frame": 10620,
+   "time": 177,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 53,
+   "beat": 4,
+   "frame": 10670,
+   "time": 177.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 54,
+   "beat": 1,
+   "frame": 10720,
+   "time": 178.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 54,
+   "beat": 2,
+   "frame": 10770,
+   "time": 179.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 54,
+   "beat": 3,
+   "frame": 10820,
+   "time": 180.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 54,
+   "beat": 4,
+   "frame": 10870,
+   "time": 181.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 55,
+   "beat": 1,
+   "frame": 10920,
+   "time": 182,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 55,
+   "beat": 2,
+   "frame": 10970,
+   "time": 182.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 55,
+   "beat": 3,
+   "frame": 11020,
+   "time": 183.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 55,
+   "beat": 4,
+   "frame": 11070,
+   "time": 184.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 56,
+   "beat": 1,
+   "frame": 11120,
+   "time": 185.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 56,
+   "beat": 2,
+   "frame": 11170,
+   "time": 186.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 56,
+   "beat": 3,
+   "frame": 11220,
+   "time": 187,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 56,
+   "beat": 4,
+   "frame": 11270,
+   "time": 187.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 57,
+   "beat": 1,
+   "frame": 11320,
+   "time": 188.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 57,
+   "beat": 2,
+   "frame": 11370,
+   "time": 189.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 57,
+   "beat": 3,
+   "frame": 11420,
+   "time": 190.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 57,
+   "beat": 4,
+   "frame": 11470,
+   "time": 191.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 58,
+   "beat": 1,
+   "frame": 11520,
+   "time": 192,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 58,
+   "beat": 2,
+   "frame": 11570,
+   "time": 192.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 58,
+   "beat": 3,
+   "frame": 11620,
+   "time": 193.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 58,
+   "beat": 4,
+   "frame": 11670,
+   "time": 194.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 59,
+   "beat": 1,
+   "frame": 11720,
+   "time": 195.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 59,
+   "beat": 2,
+   "frame": 11770,
+   "time": 196.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 59,
+   "beat": 3,
+   "frame": 11820,
+   "time": 197,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 59,
+   "beat": 4,
+   "frame": 11870,
+   "time": 197.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 60,
+   "beat": 1,
+   "frame": 11920,
+   "time": 198.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 60,
+   "beat": 2,
+   "frame": 11970,
+   "time": 199.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 60,
+   "beat": 3,
+   "frame": 12020,
+   "time": 200.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 60,
+   "beat": 4,
+   "frame": 12070,
+   "time": 201.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 61,
+   "beat": 1,
+   "frame": 12120,
+   "time": 202,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 61,
+   "beat": 2,
+   "frame": 12170,
+   "time": 202.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 61,
+   "beat": 3,
+   "frame": 12220,
+   "time": 203.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 61,
+   "beat": 4,
+   "frame": 12270,
+   "time": 204.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 62,
+   "beat": 1,
+   "frame": 12320,
+   "time": 205.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 62,
+   "beat": 2,
+   "frame": 12370,
+   "time": 206.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 62,
+   "beat": 3,
+   "frame": 12420,
+   "time": 207,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 62,
+   "beat": 4,
+   "frame": 12470,
+   "time": 207.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 63,
+   "beat": 1,
+   "frame": 12520,
+   "time": 208.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 63,
+   "beat": 2,
+   "frame": 12570,
+   "time": 209.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 63,
+   "beat": 3,
+   "frame": 12620,
+   "time": 210.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 63,
+   "beat": 4,
+   "frame": 12670,
+   "time": 211.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 64,
+   "beat": 1,
+   "frame": 12720,
+   "time": 212,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 64,
+   "beat": 2,
+   "frame": 12770,
+   "time": 212.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 64,
+   "beat": 3,
+   "frame": 12820,
+   "time": 213.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 64,
+   "beat": 4,
+   "frame": 12870,
+   "time": 214.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 65,
+   "beat": 1,
+   "frame": 12920,
+   "time": 215.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 65,
+   "beat": 2,
+   "frame": 12970,
+   "time": 216.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 65,
+   "beat": 3,
+   "frame": 13020,
+   "time": 217,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 65,
+   "beat": 4,
+   "frame": 13070,
+   "time": 217.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 66,
+   "beat": 1,
+   "frame": 13120,
+   "time": 218.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 66,
+   "beat": 2,
+   "frame": 13170,
+   "time": 219.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 66,
+   "beat": 3,
+   "frame": 13220,
+   "time": 220.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 66,
+   "beat": 4,
+   "frame": 13270,
+   "time": 221.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 67,
+   "beat": 1,
+   "frame": 13320,
+   "time": 222,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 67,
+   "beat": 2,
+   "frame": 13370,
+   "time": 222.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 67,
+   "beat": 3,
+   "frame": 13420,
+   "time": 223.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 67,
+   "beat": 4,
+   "frame": 13470,
+   "time": 224.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 68,
+   "beat": 1,
+   "frame": 13520,
+   "time": 225.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 68,
+   "beat": 2,
+   "frame": 13570,
+   "time": 226.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 68,
+   "beat": 3,
+   "frame": 13620,
+   "time": 227,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 68,
+   "beat": 4,
+   "frame": 13670,
+   "time": 227.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 69,
+   "beat": 1,
+   "frame": 13720,
+   "time": 228.666667,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 69,
+   "beat": 2,
+   "frame": 13770,
+   "time": 229.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 69,
+   "beat": 3,
+   "frame": 13820,
+   "time": 230.333333,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 69,
+   "beat": 4,
+   "frame": 13870,
+   "time": 231.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 70,
+   "beat": 1,
+   "frame": 13920,
+   "time": 232,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 70,
+   "beat": 2,
+   "frame": 13970,
+   "time": 232.833333,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 70,
+   "beat": 3,
+   "frame": 14020,
+   "time": 233.666667,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 70,
+   "beat": 4,
+   "frame": 14070,
+   "time": 234.5,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 71,
+   "beat": 1,
+   "frame": 14120,
+   "time": 235.333333,
+   "strength": 1,
+   "audible": true
+  },
+  {
+   "bar": 71,
+   "beat": 2,
+   "frame": 14170,
+   "time": 236.166667,
+   "strength": 0.3,
+   "audible": true
+  },
+  {
+   "bar": 71,
+   "beat": 3,
+   "frame": 14220,
+   "time": 237,
+   "strength": 0.6,
+   "audible": true
+  },
+  {
+   "bar": 71,
+   "beat": 4,
+   "frame": 14270,
+   "time": 237.833333,
+   "strength": 0.3,
+   "audible": true
+  }
+ ]
+}
