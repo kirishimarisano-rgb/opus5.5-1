@@ -16,6 +16,9 @@
   --umber: #4A3A2E;
   --ember: #C8643B;
   --ash:   #8C8072;
+  /* 多色陶石（Glaze: mixed）才使用的兩種釉色 */
+  --celadon: #AEBBA7;
+  --terra:   #C8643B;
   /* 光的角色（由具名色推得，不是新顏色） */
   --bright: var(--kiln);
   --deep:   var(--umber);
@@ -35,6 +38,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --kiln:  #1C1916; --clay: #3A332C; --umber: #EADFD1; --ember: #E3804F; --ash: #7A7064;
+    --celadon: #2E3A33; --terra: #E3804F;
     --bright: var(--umber); --deep: var(--kiln);
     --hl: 22%; --dk: 45%; --sh-a: 55%; --rim-a: 35%; --wt-digits: 340;
     color-scheme: dark;
@@ -42,9 +46,16 @@
 }
 :root[data-theme="dark"] {
   --kiln:  #1C1916; --clay: #3A332C; --umber: #EADFD1; --ember: #E3804F; --ash: #7A7064;
+  --celadon: #2E3A33; --terra: #E3804F;
   --bright: var(--umber); --deep: var(--kiln);
   --hl: 22%; --dk: 45%; --sh-a: 55%; --rim-a: 35%; --wt-digits: 340;
   color-scheme: dark;
+}
+/* 多色陶石：5 色 = Kiln / Umber / Oat(=Clay) / Celadon / Terracotta。
+   Terracotta 兼任強調色；Ash 不再是具名色，改由 Kiln 混 Umber 58% 推得。 */
+:root[data-glaze="mixed"] {
+  --ember: var(--terra);
+  --ash: color-mix(in oklab, var(--kiln), var(--umber) 58%);
 }
 
 * { box-sizing: border-box; }
@@ -139,7 +150,7 @@ canvas#stage.grabbing { cursor: grabbing; }
 .presets { display: flex; gap: 8px; }
 .presets .clay { --size: 40px; padding: 0 12px; font-feature-settings: "tnum"; }
 #play.paused { color: var(--ember); }   /* Ember 的第 2 種用途 */
-.corner { position: fixed; top: max(16px, env(safe-area-inset-top)); right: 16px; }
+.corner { position: fixed; top: max(16px, env(safe-area-inset-top)); right: 16px; display: flex; gap: 10px; }
 .corner .clay { --size: 40px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -161,6 +172,9 @@ canvas#stage.grabbing { cursor: grabbing; }
 <div class="sr" aria-live="polite" id="live"></div>
 
 <div class="corner">
+  <button class="clay round" id="glaze" aria-pressed="false" aria-label="多色陶石" title="多色陶石">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9.5" r="3.4" fill="currentColor"/><circle cx="16" cy="9.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="16.2" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+  </button>
   <button class="clay round" id="theme" aria-label="切換主題（自動）" title="主題：自動">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path id="themeFill" d="M12 4.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg>
   </button>
@@ -239,6 +253,9 @@ const ctx = cv.getContext('2d');
 const mqDark = matchMedia('(prefers-color-scheme: dark)');
 const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
 let reduced = mqReduce.matches || qs.get('reduced') === '1';
+let glaze = 'mono';
+try { glaze = localStorage.getItem('dots-glaze') === 'mixed' ? 'mixed' : 'mono'; } catch (e) {}
+if (qs.get('glaze') === 'mixed' || qs.get('glaze') === 'mono') glaze = qs.get('glaze');
 
 let W = 0, H = 0, DPR = 1, R = 30, G = 1800;
 const FONT = '"Fraunces", Georgia, serif';
@@ -255,8 +272,10 @@ function resolvedTheme() {
 function readPalette() {
   const cs = getComputedStyle(root);
   const g = n => hex(cs.getPropertyValue(n));
-  pal = { kiln: g('--kiln'), clay: g('--clay'), umber: g('--umber'), ember: g('--ember'), ash: g('--ash') };
   const dark = resolvedTheme() === 'dark';
+  pal = { kiln: g('--kiln'), clay: g('--clay'), umber: g('--umber'), ember: g('--ember'), ash: g('--ash'),
+          celadon: g('--celadon'), terra: g('--terra') };
+  if (glaze === 'mixed') { pal.ember = pal.terra; pal.ash = mix(pal.kiln, pal.umber, 0.58); }
   pal.bright = dark ? pal.umber : pal.kiln;
   pal.deep = dark ? pal.kiln : pal.umber;
   look = dark
@@ -265,17 +284,24 @@ function readPalette() {
 }
 
 /* ════════════════════ 材質 sprite：霧面陶土（唯一材質） ════════════════════ */
-let dotSprite, shadowSprite, bgCanvas;
+let dotSprites = [], shadowSprite, bgCanvas;
 function buildSprites() {
+  // 釉色 0 = Oat（原 Clay），1 = Celadon，2 = 赤陶本體。
+  // 純 Terracotta 保留給強調色；陶石用「未燒透」的赤陶：亮色混 Oat 35%，暗色混 Deep 45%
+  const bodies = [pal.clay, pal.celadon, look.dark ? mix(pal.terra, pal.deep, 0.45) : mix(pal.terra, pal.clay, 0.35)];
+  dotSprites = (glaze === 'mixed' ? bodies : [pal.clay]).map(makeClaySprite);
+  buildShadowSprite();
+}
+function makeClaySprite(body) {
   const S = 256, r = S / 2;
   const c = document.createElement('canvas'); c.width = c.height = S;
   const g = c.getContext('2d');
   // 漫反射：光心偏左上 0.35r
   const lx = r + LIGHT.x * Math.SQRT2 * 0.35 * r, ly = r + LIGHT.y * Math.SQRT2 * 0.35 * r;
   const grd = g.createRadialGradient(lx, ly, 0, lx, ly, 1.55 * r);
-  grd.addColorStop(0, rgb(mix(pal.clay, pal.bright, look.hl)));
-  grd.addColorStop(0.5, rgb(pal.clay));
-  grd.addColorStop(1, rgb(mix(pal.clay, pal.deep, look.dk)));
+  grd.addColorStop(0, rgb(mix(body, pal.bright, look.hl)));
+  grd.addColorStop(0.5, rgb(body));
+  grd.addColorStop(1, rgb(mix(body, pal.deep, look.dk)));
   g.fillStyle = grd; g.beginPath(); g.arc(r, r, r - 1, 0, TAU); g.fill();
   // 顆粒 ±4%
   const id = g.getImageData(0, 0, S, S), d = id.data, nr = mulberry32(7);
@@ -295,7 +321,10 @@ function buildSprites() {
   rim.addColorStop(0.1, rgb(pal.bright, look.rim)); rim.addColorStop(0.42, rgb(pal.bright, 0));
   g.strokeStyle = rim; g.lineWidth = S * 0.025;
   g.beginPath(); g.arc(r, r, r - 1 - S * 0.0125, 0, TAU); g.stroke();
-  dotSprite = c;
+  return c;
+}
+function buildShadowSprite() {
+  const S = 256, r = S / 2;
 
   // 投影：Deep 色、軟邊
   const s = document.createElement('canvas'); s.width = s.height = S;
@@ -456,18 +485,24 @@ function place(d) {
   }
   d.x = d.r + rand() * (W - 2 * d.r); d.y = d.r + rand() * (H * 0.2);
 }
+const glazeRand = mulberry32(seed ^ 0x9E3779B9);
+function pickGlaze(level) {
+  const u = glazeRand();
+  if (level >= 2 && u < 0.28) return 2;   // 赤陶只出現在小顆，當作點綴而非焦點
+  return u < 0.62 ? 0 : 1;
+}
 function makeDot(level) {
   const d = {
     level, r: R * SIZE_STEPS[level], x: 0, y: 0, vx: 0, vy: 0, m: 1,
     q: 0, qv: 0, qa: 0, p1: rand() * TAU, p2: rand() * TAU,
-    slot: null, releaseAt: Infinity, grounded: false, lift: spring(0),
+    slot: null, releaseAt: Infinity, grounded: false, lift: spring(0), glaze: pickGlaze(level),
   };
   d.m = d.r * d.r;
   return d;
 }
 function syncDots() {
   const n = targetCount();
-  if (!keeper) { keeper = makeDot(0); keeper.keeper = true; dots.push(keeper); place(keeper); }
+  if (!keeper) { keeper = makeDot(0); keeper.keeper = true; keeper.glaze = 0; dots.push(keeper); place(keeper); }
   while (dots.length > n) dots.pop();
   while (dots.length < n) { const d = makeDot(pickLevel()); dots.push(d); place(d); }
   for (const d of dots) {
@@ -685,7 +720,7 @@ function readObstacles() {
     obstacles.push({ cx: b.left + b.width / 2, cy: b.top + b.height / 2, hw: Math.max(0, b.width / 2 - b.height / 2), cr });
   };
   if (!bar.classList.contains('hidden')) bar.querySelectorAll('.clay, .field').forEach(add);
-  add(themeBtn);
+  add(themeBtn); add(glazeBtn);
 }
 function collide() {
   const n = dots.length;
@@ -759,7 +794,7 @@ function drawShadow(d) {
 function drawBody(d) {
   const m = squashMatrix(d, 1 + d.lift.x * 0.06);
   ctx.setTransform(m[0] * DPR, m[1] * DPR, m[2] * DPR, m[3] * DPR, d.x * DPR, d.y * DPR);
-  ctx.drawImage(dotSprite, -d.r, -d.r, d.r * 2, d.r * 2);
+  ctx.drawImage(dotSprites[d.glaze] || dotSprites[0], -d.r, -d.r, d.r * 2, d.r * 2);
   if (d === keeper) drawEyes(d.r);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
@@ -1009,6 +1044,15 @@ addEventListener('keydown', e => {
 });
 addEventListener('pointermove', () => activity(performance.now()), { passive: true });
 
+const glazeBtn = document.getElementById('glaze');
+function applyGlaze(g) {
+  glaze = g;
+  if (g === 'mixed') root.dataset.glaze = 'mixed'; else delete root.dataset.glaze;
+  glazeBtn.setAttribute('aria-pressed', String(g === 'mixed'));
+  glazeBtn.title = g === 'mixed' ? '多色陶石（開）' : '多色陶石（關）';
+  try { localStorage.setItem('dots-glaze', g); } catch (e) {}
+}
+glazeBtn.addEventListener('click', () => { applyGlaze(glaze === 'mixed' ? 'mono' : 'mixed'); retheme(); announce(glaze === 'mixed' ? '多色陶石' : '單色陶石'); });
 const THEMES = ['auto', 'light', 'dark'];
 function applyTheme(t) {
   if (t === 'auto') delete root.dataset.theme; else root.dataset.theme = t;
@@ -1040,6 +1084,7 @@ function resize() {
 addEventListener('resize', resize);
 
 /* ════════════════════ 啟動 ════════════════════ */
+applyGlaze(glaze);
 readPalette();
 applyTheme(THEMES[themeIdx]);
 resize();
