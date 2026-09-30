@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf-8"><title>entropy style frames</title>
+<body style="margin:0;background:#000"><canvas id="c"></canvas>
+<script type="module">
+import { Renderer } from '../src/engine/renderer.js';
+import { TOKEN_UNIFORM, tokenCss } from '../src/film/tokens.js';
+import { buildWorld } from '../src/film/world.js';
+import { buildStyle, FRAMES } from '../src/film/styleframes.js';
+const R = new Renderer(document.getElementById('c'), { tokens: TOKEN_UNIFORM, outW: 1920, outH: 1080, ss: 2, msaa: 4 });
+const W = buildWorld(R); const S = buildStyle(R, W);
+const font = new FontFace('Noto Serif TC', 'url(../assets/fonts/NotoSerifTC-Light.subset.woff2)');
+await font.load(); document.fonts.add(font);
+const tc = document.createElement('canvas'); tc.width = 1920; tc.height = 1080;
+function vertical(t) { // 直排: one column, punctuation set to the upper right of its cell
+  const g = tc.getContext('2d'); g.clearRect(0, 0, 1920, 1080);
+  if (!t) return null;
+  const size = 34, step = size * 1.55;
+  g.font = `300 ${size}px "Noto Serif TC"`; g.fillStyle = tokenCss(t.tok); g.textAlign = 'center'; g.textBaseline = 'middle';
+  [...t.s].forEach((ch, i) => {
+    const punct = '，。'.includes(ch);
+    g.fillText(ch, t.x + (punct ? size * 0.55 : 0), t.y + i * step - (punct ? size * 0.45 : 0));
+  });
+  return tc;
+}
+window.renderFrame = (name) => {
+  const f = FRAMES[name](R, W, S);
+  const tex = R.renderView({ view: R.main, cam: f.cam, clear: [0, 0, 0], draws: f.draws, time: 3 });
+  R.setText(vertical(f.text));
+  // the text canvas holds straight alpha; renderer composites premultiplied → premultiply via compositing mode
+  R.finish(tex, { exposure: 1, bloom: 0, bloomThreshold: 0.9, vignette: 0, grain: 0.008, ...f.post }, 1);
+  return R.canvas.toDataURL('image/png');
+};
+window.frames = Object.keys(FRAMES); window.ready = true;
+</script>

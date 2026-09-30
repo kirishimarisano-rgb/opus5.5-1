@@ -41,6 +41,7 @@ void main(){
   particle(pos, size, col, alpha);
   vec4 clip = uVP*vec4(pos,1.);
   if(alpha<=1e-5 || clip.w<=0.02){ gl_Position=vec4(2.,2.,2.,1.); return; }
+  alpha *= smoothstep(0.12, 0.45, clip.w); // no particles in the lens
   float px = size*uProj/clip.w;
   float pc = max(px, uMinPx);
   alpha *= (px*px)/(pc*pc);
@@ -102,7 +103,7 @@ void main(){
 }`;
 const SHARD_FS = (body) => `
 in vec2 vUV; in float vEdge; in vec3 vN; in vec3 vW; flat in vec4 vTint; flat in float vEdgeGlow; flat in float vAlpha; flat in float vId;
-uniform sampler2D uTex; uniform float uEdgeTok; uniform float uSheen; out vec4 o;
+uniform sampler2D uTex; uniform float uEdgeTok; uniform float uSheen; uniform float uSheenTok; out vec4 o;
 ${body}
 void main(){
   vec3 c = texture(uTex, vUV).rgb;
@@ -113,10 +114,10 @@ void main(){
   vec3 L = normalize(vec3(-0.4, 0.8, 0.6));
   float spec = pow(max(dot(reflect(-L, N), V), 0.), 24.);
   float fres = pow(1. - abs(dot(N, V)), 3.);
-  c += TOK(uEdgeTok)*uSheen*(spec*1.4 + fres*0.25);
+  c += TOK(uSheenTok)*uSheen*(spec*1.4 + fres*0.25);
   float ew = fwidth(vEdge);
   float edge = exp(-vEdge/max(ew*2.2, 1e-5));
-  c += TOK(uEdgeTok)*vEdgeGlow*edge*3.0;
+  c += TOK(uEdgeTok)*vEdgeGlow*edge*1.5;
   float a = vAlpha*vTint.a;
   o = vec4(c*a, a);
 }`;
@@ -181,7 +182,7 @@ void main(){
   float my = clamp(min(px.y-uMatte.y, uMatte.w-px.y)+0.5, 0., 1.);
   c = mix(uTok[int(uMatteTok)], c, mx*my);
   vec4 t = texture(uText, vec2(uv.x, 1.-uv.y));
-  c = c*(1.-t.a) + t.rgb;
+  c = c*(1.-t.a) + pow(t.rgb, vec3(2.2));
   c *= uFade;
   vec3 s = toSRGB(c);
   float n = hash(vec3(px, uFrame)) + hash(vec3(px+17.3, uFrame*1.37)) - 1.0; // triangular dither
@@ -295,6 +296,7 @@ export class Renderer {
   setText(source) { // source: canvas / ImageBitmap at output res, or null
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, this.textTex);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     if (source) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
     this.hasText = !!source;
   }

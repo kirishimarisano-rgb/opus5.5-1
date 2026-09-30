@@ -7,7 +7,7 @@ import { T } from './tokens.js';
 import { LINES_BASIC, lineBuf } from './world.js';
 import { mulberry32 } from '../engine/math.js';
 
-const HORIZON = -0.3;
+export const HORIZON = -0.3;
 
 // ---- shared particle snippets ----------------------------------------------
 // a0=(pos.xyz,size) a1=(tok,bright,phase,twinkle) a2=(flowSpeed, wrapHalf, band, _)
@@ -59,7 +59,7 @@ function dustField(R, { n = 16000, seed = 3, toks = ['azure-0', 'azure-1', 'azur
 }
 
 // The current: a horizontal river of cold particles along the horizon.
-function river(R, { n = 42000, seed = 4, y = HORIZON, speed = 0.05 } = {}) {
+export function river(R, { n = 42000, seed = 4, y = HORIZON, speed = 0.05 } = {}) {
   const rnd = mulberry32(seed), d = new Float32Array(n * 16);
   const g = () => (rnd() + rnd() + rnd() - 1.5) / 1.5;
   for (let i = 0; i < n; i++) {
@@ -130,7 +130,7 @@ function buildTree(R, W) {
 }
 
 // Seed hexagon with its gold seam (the retained imperfection), placed by a transform.
-function seedSystems(R, W) {
+export function seedSystems(R, W) {
   const s = W.flake.seed;
   const hex = G.hexOutline([0, 0], s.r, s.rot);
   const l = [];
@@ -146,6 +146,7 @@ function seedSystems(R, W) {
     }
   });
   const lines = R.system('lines', { data: lineBuf(l), glsl: LINES_BASIC });
+  const seam = R.system('lines', { data: lineBuf(l.slice(6)), glsl: LINES_BASIC });
   const fill = R.system('shards', {
     data: G.shardVertices([hex]),
     glsl: /* glsl */ `uniform mat4 uModel;
@@ -153,10 +154,10 @@ function seedSystems(R, W) {
         M = uModel; M[3] += uModel*vec4(c,0.,0.); tint = vec4(1.); eg = 0.; a = uP0.x; }`,
     fsGlsl: /* glsl */ `vec3 shade(vec3 c, vec2 uv, float id){ float g = smoothstep(0.9, 0.1, uv.y*0.7 + uv.x*0.3); return mix(TOK(${T['azure-2']}), TOK(${T['azure-0']}), 0.08 + 0.25*g)*0.35; }`,
   });
-  return { lines, fill };
+  return { lines, seam, fill };
 }
 
-function modelMat(tx, ty, tz, rotZ = 0, sc = 1) {
+export function modelMat(tx, ty, tz, rotZ = 0, sc = 1) {
   const c = Math.cos(rotZ) * sc, s = Math.sin(rotZ) * sc;
   return [c, s, 0, 0, -s, c, 0, 0, 0, 0, sc, 0, tx, ty, tz, 1];
 }
@@ -242,11 +243,11 @@ export function finalDraws(F, W, which, time, { macro = false, off = null } = {}
   const d = [];
   const halo = on('halo') ? 1 : 0;
   const seedHexDraw = (M, i = 1, seam = true) => {
-    d.push({ sys: F.seed.fill, blend: 'over', u: { uModel: M, uP0: [0.35, 0, 0, 0], uEdgeTok: T['azure-0'], uSheen: 0.25 } });
+    d.push({ sys: F.seed.fill, blend: 'over', u: { uModel: M, uP0: [0.35, 0, 0, 0], uEdgeTok: T['azure-0'], uSheenTok: T['azure-0'], uSheen: 0.25 } });
     d.push({ sys: F.seed.lines, blend: 'max', u: { uModel: M, ...L_ALL(i), uP1: [0.8, 0.25 * halo, 1, 0] }, count: seam ? undefined : 6 });
   };
   if (on('dust')) d.push({ sys: F.dust, u: { uP0: [0.6, 0, 0, 0] } });
-  if (on('drift')) d.push({ sys: F.drift, blend: 'over', u: { uP0: [0.9, 0, 0, 0], uEdgeTok: T['azure-0'], uSheen: 0.6 } });
+  if (on('drift')) d.push({ sys: F.drift, blend: 'over', u: { uP0: [0.9, 0, 0, 0], uEdgeTok: T['azure-0'], uSheenTok: T['azure-0'], uSheen: 0.6 } });
   // the current: 1/4 of the particles, only the brightest drawn (count), dim
   if (on('river')) d.push({ sys: F.river, count: 10000, u: { uP0: [which === 'A' ? 0.55 : 0.3, 0, 0, 0] } });
   if (which === 'A') {

@@ -28,6 +28,9 @@ void grow(inout vec3 p0, inout vec3 p1, out float vis){
 export const LINES_BASIC = LINE_COMMON + /* glsl */ `
 void segment(out vec3 p0, out vec3 p1, out float w, out vec3 col, out float alpha, out float glow, out float glowAmt){
   p0 = a0.xyz; p1 = a1.xyz; float vis; grow(p0, p1, vis);
+  if(a3.w > 0.5){ // the seed: slipped by uP2.xy, turned by uP2.z about its centre uP3.xy
+    float c = cos(uP2.z), s = sin(uP2.z); mat2 Rr = mat2(c, s, -s, c);
+    p0.xy = Rr*(p0.xy-uP3.xy)+uP3.xy+uP2.xy; p1.xy = Rr*(p1.xy-uP3.xy)+uP3.xy+uP2.xy; }
   p0 = (uModel*vec4(p0,1.)).xyz; p1 = (uModel*vec4(p1,1.)).xyz;
   w = a0.w*uP1.x;
   float tk = uP0.w >= 0. ? uP0.w : a2.y;          // fractional token = gradient map toward the next token
@@ -53,7 +56,7 @@ export function buildWorld(R) {
       vec3 shade(vec3 c, vec2 uv, float id){
         vec2 p = uv - 0.5;
         float r = length(p);
-        vec3 col = mix(TOK(${T['ice-1']}), TOK(${T['ice-2']}), smoothstep(0.0, 0.62, r));
+        vec3 col = mix(TOK(${T['ice-2']}), TOK(${T['ice-3']}), smoothstep(0.0, 0.62, length(p - vec2(-0.18, 0.22))));  // raking light from upper left
         col = mix(col, TOK(${T['ice-3']}), smoothstep(0.45, 0.72, r)*0.55);
         float fr = vnoise(vec3(uv*180., 1.3))*0.5 + vnoise(vec3(uv*55., 7.1))*0.5;
         col *= 1. + 0.035*fr;
