@@ -189,6 +189,9 @@ canvas#stage.grabbing { cursor: grabbing; }
 <div class="sr" aria-live="polite" id="live"></div>
 
 <div class="corner">
+  <button class="clay round" id="faces" aria-label="臉的數量" title="臉的數量（F）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="8.7" y="9.4" width="2" height="4.6" rx="1" fill="currentColor"/><rect x="13.3" y="9.4" width="2" height="4.6" rx="1" fill="currentColor"/></svg>
+  </button>
   <button class="clay round" id="glaze" aria-expanded="false" aria-controls="tray" aria-label="釉組" title="釉組（G）">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9.5" r="3.4" fill="currentColor"/><circle cx="16" cy="9.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="16.2" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
   </button>
@@ -551,17 +554,39 @@ function makeDot(level) {
 }
 function syncDots() {
   const n = targetCount();
-  if (!keeper) { keeper = makeDot(0); keeper.keeper = true; keeper.glaze = 0; dots.push(keeper); place(keeper); }
+  if (!keeper) { keeper = makeDot(0); keeper.keeper = true; keeper.glaze = 0; keeper.face = makeFace('keeper'); dots.push(keeper); place(keeper); }
   while (dots.length > n) dots.pop();
   while (dots.length < n) { const d = makeDot(pickLevel()); dots.push(d); place(d); }
   for (const d of dots) {
     d.r = R * SIZE_STEPS[d.level]; d.m = d.r * d.r;
     d.x = clamp(d.x, d.r, W - d.r); d.y = clamp(d.y, d.r, H - d.r);
   }
+  assignFaces();
 }
 
 /* Keeper 的眼睛：Settle spring 驅動 */
-const eye = { open: spring(1), tall: spring(1), gx: spring(0), gy: spring(0), smile: spring(0), nextBlink: 0, blinkEnd: 0, happyUntil: 0 };
+/* 臉：Keeper 是隊長，其餘是個性不同的夥伴。每張臉的眼睛都由 Settle spring 驅動 */
+const makeFace = persona => ({ persona, open: spring(1), tall: spring(1), gx: spring(0), gy: spring(0), smile: spring(0),
+  nextBlink: performance.now() + 800 + rand() * 4000, blinkEnd: 0, happyUntil: 0 });
+const PERSONAS = ['curious', 'sleepy', 'follower', 'shy'];   // 好奇、愛睏、跟班、害羞
+const FACE_OPTIONS = [1, 5, 12];
+let faceCount = 5;
+try { const v = +localStorage.getItem('dots-faces'); if (FACE_OPTIONS.includes(v)) faceCount = v; } catch (e) {}
+if (FACE_OPTIONS.includes(+qs.get('faces'))) faceCount = +qs.get('faces');
+let performer = null;            // { dot, until }：正在表演的那一顆，其他臉會看向它
+let labelNote = null;            // { text, until }：暫時取代狀態標籤的提示
+function assignFaces() {
+  // 夥伴優先挑大顆（眼睛才讀得清楚），依陣列順序決定，切換數量時不會亂換人
+  const want = Math.min(faceCount - 1, dots.length - 1);
+  const pool = dots.filter(d => d !== keeper && d.level <= 2).sort((a, b) => a.level - b.level || dots.indexOf(a) - dots.indexOf(b));
+  const chosen = new Set(pool.slice(0, want));
+  let i = 0;
+  for (const d of dots) {
+    if (d === keeper) continue;
+    if (chosen.has(d)) { if (!d.face) d.face = makeFace(PERSONAS[i % PERSONAS.length]); i++; }
+    else d.face = null;
+  }
+}
 
 /* ════════════════════ 倒數 ════════════════════ */
 const timer = { dur: 300000, state: 'ready', endAt: 0, rem: 300000 };
@@ -769,7 +794,7 @@ function readObstacles() {
     obstacles.push({ cx: b.left + b.width / 2, cy: b.top + b.height / 2, hw: Math.max(0, b.width / 2 - b.height / 2), cr });
   };
   if (!bar.classList.contains('hidden')) bar.querySelectorAll('.clay, .field').forEach(add);
-  add(themeBtn); add(glazeBtn);
+  add(themeBtn); add(glazeBtn); add(facesBtn);
   if (tray.classList.contains('open')) add(tray);
 }
 function collide() {
@@ -845,13 +870,14 @@ function drawBody(d) {
   const m = squashMatrix(d, 1 + d.lift.x * 0.06);
   ctx.setTransform(m[0] * DPR, m[1] * DPR, m[2] * DPR, m[3] * DPR, d.x * DPR, d.y * DPR);
   ctx.drawImage(dotSprites[d.glaze] || dotSprites[0], -d.r, -d.r, d.r * 2, d.r * 2);
-  if (d === keeper) drawEyes(d.r);
+  if (d.face) drawEyes(d.face, d.r, d === keeper ? 1 : 0.88);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
-function drawEyes(r) {
-  const open = clamp(eye.open.x, 0, 1.3), tall = eye.tall.x, smile = clamp(eye.smile.x, 0, 1);
+function drawEyes(eye, r, k) {
+  // k：夥伴的眼睛略小（0.88），保持 Keeper 的焦點地位
+  const open = clamp(eye.open.x, 0, 1.3), tall = eye.tall.x * k, smile = clamp(eye.smile.x, 0, 1);
   const gx = eye.gx.x * r * 0.16, gy = eye.gy.x * r * 0.12 - r * 0.04;
-  const ew = r * 0.13, gap = r * 0.23;
+  const ew = r * 0.13 * k, gap = r * 0.23;
   ctx.fillStyle = rgb(pal.umber); ctx.strokeStyle = rgb(pal.umber);
   ctx.lineCap = 'round'; ctx.lineWidth = r * 0.075;
   for (const s of [-1, 1]) {
@@ -925,7 +951,7 @@ function render(now) {
     }
   }
   const label = { ready: 'ready', running: 'remaining', paused: 'paused', done: 'done' }[timer.state];
-  drawLabel(label);
+  drawLabel(labelNote && now < labelNote.until ? labelNote.text : label);
 
   drawWell();
   for (const d of dots) drawShadow(d);
@@ -938,22 +964,45 @@ function render(now) {
   drawVignette();
 }
 
-/* Keeper 情緒 */
+/* 臉的情緒：模式決定大方向，個性決定細節；有人在表演時，其他臉都看向它（群體把焦點讓出來） */
 function updateEyes(dt, now) {
+  if (performer && now > performer.until) performer = null;
+  if (drag) performer = { dot: drag.dot, until: now + T.t4 };
+  for (const d of dots) if (d.face) updateFace(d, d.face, dt, now);
+}
+function updateFace(d, eye, dt, now) {
+  const p = eye.persona, isStar = performer && performer.dot === d;
   let open = 1, tall = 1, smile = 0;
+  if (p === 'sleepy' && mode === 'idle') open = 0.55;           // 半睜眼
   if (mode === 'sleeping') open = 0;
   if (mode === 'alert') tall = 1.25;
-  if (mode === 'down' && now > keeper.releaseAt + T.t4 && Math.hypot(keeper.vx, keeper.vy) < 80) smile = 1;   // 落定後滿足地闔眼
+  if (mode === 'down' && now > d.releaseAt + T.t4 && Math.hypot(d.vx, d.vy) < 80) smile = 1;   // 落定後滿足地闔眼
   if (now < eye.happyUntil) smile = 1;
-  if (!reduced && open > 0 && now > eye.nextBlink) { eye.blinkEnd = now + T.t2; eye.nextBlink = now + 2600 + rand() * 3800; }
+  if (!reduced && open > 0 && now > eye.nextBlink) {
+    eye.blinkEnd = now + T.t2;
+    eye.nextBlink = now + (p === 'sleepy' ? 1800 : 2600) + rand() * 3800;
+  }
   if (now < eye.blinkEnd) open = 0;
-  // 視線：拖曳／指標 > 時鐘
-  let tx = clock.cx, ty = clock.cy;
-  if (drag || well || now - pointer.t < 2400) { tx = pointer.x; ty = pointer.y; }
-  if (drag && drag.dot === keeper) { tx = keeper.x + keeper.vx; ty = keeper.y + keeper.vy; }
-  const dx = tx - keeper.x, dy = ty - keeper.y, l = Math.hypot(dx, dy) || 1, f = Math.min(1, l / (R * 4));
+
+  // 視線
+  const pointerLive = drag || well || now - pointer.t < 2400;
+  let tx = clock.cx, ty = clock.cy, gain = 1;
+  if (mode === 'alert') { /* 全員盯著時鐘 */ }
+  else if (performer && !isStar) { tx = performer.dot.x; ty = performer.dot.y; }
+  else if (p === 'keeper') { if (pointerLive) { tx = pointer.x; ty = pointer.y; } }
+  else if (p === 'curious') { if (now - pointer.t < 6000) { tx = pointer.x; ty = pointer.y; gain = 1.15; } }
+  else if (p === 'follower') { tx = keeper.x; ty = keeper.y; }
+  else if (p === 'shy') {
+    if (pointerLive && Math.hypot(pointer.x - d.x, pointer.y - d.y) < R * 4) {
+      tx = 2 * d.x - pointer.x; ty = 2 * d.y - pointer.y; tall *= 0.8;    // 別過頭、縮一下
+    }
+  }
+  if (drag && drag.dot === d) { tx = d.x + d.vx; ty = d.y + d.vy; }
+  const dx = tx - d.x, dy = ty - d.y, l = Math.hypot(dx, dy) || 1, f = Math.min(1, l / (R * 4)) * gain;
   const S = reduced ? { w: 40, z: 1 } : SPRING_SETTLE;
-  springTo(eye.open, open, open < eye.open.x ? { w: 28, z: 1 } : S, dt);
+  // 閉眼快、眨完睜眼也俐落；從睡眠醒來才用較慢的 Settle
+  const openSp = open < eye.open.x ? { w: 28, z: 1 } : (mode === 'sleeping' || reduced ? S : { w: 18, z: 1 });
+  springTo(eye.open, open, openSp, dt);
   springTo(eye.tall, tall, S, dt);
   springTo(eye.smile, smile, S, dt);
   springTo(eye.gx, dx / l * f, S, dt);
@@ -1024,7 +1073,7 @@ function endPress(e) {
   if (drag) {
     const d = drag.dot;
     if (tap && !reduced) {
-      if (d === keeper) { d.vy -= 620; d.qv += 1.6; d.qa = Math.PI / 2; eye.happyUntil = now + T.t5; }
+      if (d.face) { d.vy -= 620; d.qv += 1.6; d.qa = Math.PI / 2; d.face.happyUntil = now + T.t5; performer = { dot: d, until: now + T.t5 }; }
       else { const a = Math.atan2(d.y - press.y, d.x - press.x); d.vx += Math.cos(a) * 180; d.vy += Math.sin(a) * 180 - 120; d.qv += 1.2; d.qa = Math.PI / 2; }
     } else if (!reduced) { d.vx = clamp(press.vx, -2400, 2400); d.vy = clamp(press.vy, -2400, 2400); }
     drag = null; cv.classList.remove('grabbing');
@@ -1139,6 +1188,18 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') setTray(false);
   if (e.key === 'g' || e.key === 'G') selectGlaze(GLAZE_IDS[(GLAZE_IDS.indexOf(glaze) + 1) % GLAZE_IDS.length]);
 });
+const facesBtn = document.getElementById('faces');
+function setFaces(n, note = true) {
+  faceCount = n;
+  try { localStorage.setItem('dots-faces', String(n)); } catch (e) {}
+  assignFaces();
+  facesBtn.setAttribute('aria-label', `臉的數量：${n}`);
+  facesBtn.title = `臉的數量：${n}（F）`;
+  if (note) { labelNote = { text: n === 1 ? 'one face' : `${n} faces`, until: performance.now() + T.t5 }; announce(`${n} 張臉`); }
+}
+const nextFaces = () => setFaces(FACE_OPTIONS[(FACE_OPTIONS.indexOf(faceCount) + 1) % FACE_OPTIONS.length]);
+facesBtn.addEventListener('click', nextFaces);
+addEventListener('keydown', e => { if (e.target !== input && (e.key === 'f' || e.key === 'F')) nextFaces(); });
 const THEMES = ['auto', 'light', 'dark'];
 function applyTheme(t) {
   if (t === 'auto') delete root.dataset.theme; else root.dataset.theme = t;
@@ -1175,6 +1236,7 @@ applyGlazeTokens();
 readPalette();
 applyTheme(THEMES[themeIdx]);
 resize();
+setFaces(faceCount, false);
 if (reduced) { readObstacles(); for (let i = 0; i < 720; i++) step(FIXED_DT, 0); }   // 靜止狀態直接落定
 updateUI();
 const fontReady = document.fonts ? Promise.race([document.fonts.load(`400 ${FS.f6}px Fraunces`), new Promise(r => setTimeout(r, 1500))]) : Promise.resolve();
