@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dots Countdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&display=swap" rel="stylesheet">
+<style>
+/* ───────── Design tokens（見 DESIGN.md，所有數值只能來自這裡） ───────── */
+:root {
+  /* 色彩：5 個具名色 */
+  --kiln:  #EFE8DD;
+  --clay:  #D9C7B0;
+  --umber: #4A3A2E;
+  --ember: #C8643B;
+  --ash:   #8C8072;
+  /* 光的角色（由具名色推得，不是新顏色） */
+  --bright: var(--kiln);
+  --deep:   var(--umber);
+  --hl: 38%;       /* 高光混入量 */
+  --dk: 22%;       /* 暗部混入量 */
+  --sh-a: 22%;     /* 投影不透明度 */
+  --rim-a: 15%;    /* 左上邊緣受光 */
+  --wt-digits: 400;
+  /* 動態 */
+  --kiln-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t1: 120ms; --t2: 240ms; --t3: 480ms; --t4: 960ms; --t5: 1920ms;
+  /* 字級：Perfect Fifth 1.5 */
+  --fs-0: 11px; --fs-1: 16px; --fs-2: 24px; --fs-3: 36px;
+  --fs-4: 54px; --fs-5: 81px; --fs-6: 122px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --kiln:  #1C1916; --clay: #3A332C; --umber: #EADFD1; --ember: #E3804F; --ash: #7A7064;
+    --bright: var(--umber); --deep: var(--kiln);
+    --hl: 22%; --dk: 45%; --sh-a: 55%; --rim-a: 35%; --wt-digits: 340;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --kiln:  #1C1916; --clay: #3A332C; --umber: #EADFD1; --ember: #E3804F; --ash: #7A7064;
+  --bright: var(--umber); --deep: var(--kiln);
+  --hl: 22%; --dk: 45%; --sh-a: 55%; --rim-a: 35%; --wt-digits: 340;
+  color-scheme: dark;
+}
+/* 釉組（多色陶石）：由 JS 以 inline 變數覆寫同一組 token，見 GLAZES 與 DESIGN.md §10 */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--kiln);
+  color: var(--umber);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: var(--fs-1);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+canvas#stage {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh; height: 100dvh;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+canvas#stage.grabbing { cursor: grabbing; }
+
+/* ───────── 凸起的陶土（按鈕） ───────── */
+.clay {
+  --size: 44px;
+  appearance: none; border: 0; margin: 0;
+  height: var(--size); min-width: var(--size);
+  border-radius: calc(var(--size) / 2);
+  padding: 0 14px;
+  font: inherit; font-size: var(--fs-1); font-weight: 400;
+  color: var(--umber);
+  background: radial-gradient(circle at 32% 28%,
+      color-mix(in oklab, var(--clay), var(--bright) var(--hl)) 0%,
+      var(--clay) 52%,
+      color-mix(in oklab, var(--clay), var(--deep) var(--dk)) 100%);
+  /* 光源 135°：投影落在右下（0.18r, 0.22r），左上邊緣受光 */
+  box-shadow:
+    calc(var(--size) * 0.09) calc(var(--size) * 0.11) calc(var(--size) * 0.3)
+      color-mix(in srgb, var(--deep) var(--sh-a), transparent),
+    inset 1px 1px 0 color-mix(in srgb, var(--bright) var(--rim-a), transparent);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: box-shadow var(--t1) var(--kiln-ease), background var(--t1) var(--kiln-ease), transform var(--t1) var(--kiln-ease);
+}
+.clay.round { padding: 0; width: var(--size); }
+.clay svg { width: 18px; height: 18px; display: block; }
+/* 按下 = 壓進桌面，變成凹陷：左上內陰影，右下內壁受光 */
+.clay:active, .clay[aria-pressed="true"] {
+  background: var(--kiln);
+  box-shadow:
+    inset 3px 4px 7px color-mix(in srgb, var(--deep) calc(var(--sh-a) * 1.3), transparent),
+    inset -2px -2px 4px color-mix(in srgb, var(--bright) 45%, transparent);
+}
+.clay:focus-visible { outline: 1.5px solid var(--umber); outline-offset: 3px; }
+
+/* ───────── 凹陷的欄位 ───────── */
+.field {
+  height: 44px; width: 86px; border-radius: 22px;
+  background: var(--kiln);
+  box-shadow:
+    inset 3px 4px 7px color-mix(in srgb, var(--deep) calc(var(--sh-a) * 1.3), transparent),
+    inset -2px -2px 4px color-mix(in srgb, var(--bright) 45%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.field input {
+  width: 100%; height: 100%; border: 0; background: transparent;
+  font: inherit; font-size: var(--fs-1); color: var(--umber);
+  text-align: center; font-variant-numeric: tabular-nums;
+  caret-color: var(--ember);
+  outline: none; padding: 0 12px;
+  user-select: text; -webkit-user-select: text;
+}
+.field input::placeholder { color: var(--ash); }
+.field::after {             /* 聚焦時的 Ember 底線（Ember 的第 3 種用途） */
+  content: ""; position: absolute; left: 28%; right: 28%; bottom: 8px; height: 1.5px; border-radius: 1px;
+  background: var(--ember); opacity: 0; transform: scaleX(0.4);
+  transition: opacity var(--t2) var(--kiln-ease), transform var(--t2) var(--kiln-ease);
+}
+.field:focus-within::after { opacity: 1; transform: none; }
+
+/* ───────── 控制列 ───────── */
+.bar {
+  position: fixed; left: 50%; bottom: max(16px, calc(env(safe-area-inset-bottom) + 10px));
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  transition: opacity var(--t3) var(--kiln-ease), transform var(--t3) var(--kiln-ease);
+}
+.bar .sep { width: 4px; }
+.bar.hidden { opacity: 0; transform: translate(-50%, 8px); pointer-events: none; }
+.presets { display: flex; gap: 8px; }
+.presets .clay { --size: 40px; padding: 0 12px; font-feature-settings: "tnum"; }
+#play.paused { color: var(--ember); }   /* Ember 的第 2 種用途 */
+.corner { position: fixed; top: max(16px, env(safe-area-inset-top)); right: 16px; display: flex; gap: 10px; }
+.corner .clay { --size: 40px; }
+/* 釉組色票：凹陷的托盤，裡面是凸起的陶土色票 */
+.tray {
+  position: fixed; right: 16px; top: calc(max(16px, env(safe-area-inset-top)) + 54px);
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 6px 6px 16px; border-radius: 28px;
+  background: var(--kiln);
+  box-shadow:
+    inset 3px 4px 7px color-mix(in srgb, var(--deep) calc(var(--sh-a) * 1.3), transparent),
+    inset -2px -2px 4px color-mix(in srgb, var(--bright) 45%, transparent);
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity var(--t3) var(--kiln-ease), transform var(--t3) var(--kiln-ease), visibility 0s linear var(--t3);
+}
+.tray.open { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.tray-label {
+  font-size: var(--fs-0); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ash); min-width: 7.5em; white-space: nowrap;
+}
+.chips { display: flex; gap: 6px; }
+.chips .clay { --size: 36px; }
+.chips .clay svg { width: 22px; height: 22px; }
+#glaze[aria-expanded="true"] {
+  background: var(--kiln);
+  box-shadow:
+    inset 3px 4px 7px color-mix(in srgb, var(--deep) calc(var(--sh-a) * 1.3), transparent),
+    inset -2px -2px 4px color-mix(in srgb, var(--bright) 45%, transparent);
+}
+@media (max-width: 400px) { .tray-label { display: none; } .tray { padding-left: 6px; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 400px) {
+  .bar { gap: 8px; }
+  .bar .sep { width: 0; }
+  .presets { gap: 6px; }
+  .presets .clay { --size: 38px; padding: 0 10px; }
+  .field { width: 78px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .clay, .bar, .field::after { transition-duration: var(--t3); transition-property: opacity, background, box-shadow; }
+  .bar.hidden { transform: translateX(-50%); }
+}
+</style>
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="sr" aria-live="polite" id="live"></div>
+
+<div class="corner">
+  <button class="clay round" id="faces" aria-label="臉的數量" title="臉的數量（F）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="8.7" y="9.4" width="2" height="4.6" rx="1" fill="currentColor"/><rect x="13.3" y="9.4" width="2" height="4.6" rx="1" fill="currentColor"/></svg>
+  </button>
+  <button class="clay round" id="glaze" aria-expanded="false" aria-controls="tray" aria-label="釉組" title="釉組（G）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9.5" r="3.4" fill="currentColor"/><circle cx="16" cy="9.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="16.2" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+  </button>
+  <button class="clay round" id="theme" aria-label="切換主題（自動）" title="主題：自動">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path id="themeFill" d="M12 4.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg>
+  </button>
+</div>
+
+<div class="tray" id="tray" role="radiogroup" aria-label="釉組">
+  <span class="tray-label" id="trayLabel"></span>
+  <div class="chips" id="chips"></div>
+</div>
+
+<div class="bar" id="bar">
+  <div class="presets" role="group" aria-label="預設時長">
+    <button class="clay" data-sec="60"   aria-pressed="false" title="1 分鐘">1′</button>
+    <button class="clay" data-sec="300"  aria-pressed="false" title="5 分鐘">5′</button>
+    <button class="clay" data-sec="1500" aria-pressed="false" title="25 分鐘">25′</button>
+  </div>
+  <span class="sep"></span>
+  <label class="field" title="自訂時長：mm:ss 或分鐘數，按 Enter 開始">
+    <span class="sr">自訂時長</span>
+    <input id="custom" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="mm:ss" value="05:00">
+  </label>
+  <button class="clay round" id="play" aria-label="開始">
+    <svg viewBox="0 0 24 24" aria-hidden="true" id="playIcon"></svg>
+  </button>
+  <button class="clay round" id="reset" aria-label="重設">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 9.2A6.6 6.6 0 1 1 5.6 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M5.2 5.4v4.2h4.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ════════════════════ 設計系統（與 DESIGN.md 一一對應） ════════════════════ */
+const TAU = Math.PI * 2;
+const T = { t1: 120, t2: 240, t3: 480, t4: 960, t5: 1920 };           // 時間刻度
+const FS = { f0: 11, f1: 16, f2: 24, f3: 36, f4: 54, f5: 81, f6: 122 }; // 字級 1.5
+const SPRING_CLAY   = { w: 14, z: 0.38 };                              // 曲線 1
+const SPRING_SETTLE = { w: 7,  z: 1.0  };                              // 曲線 2
+const kilnEase = cubicBezier(0.22, 1, 0.36, 1);                        // 曲線 3
+const LIGHT = { x: -Math.SQRT1_2, y: -Math.SQRT1_2 };                  // 唯一光源 135°
+const MATERIAL = { eDot: 0.32, eWall: 0.40, eClock: 0.28, squashMax: 0.30 };
+const SIZE_STEPS = [1, 0.75, 0.5625, 0.421875];
+const SIZE_WEIGHTS = [0.15, 0.3, 0.3, 0.25];
+const MAX_PARTICLES = 40;
+const FIXED_DT = 1 / 120;
+
+function cubicBezier(x1, y1, x2, y2) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const sx = t => ((ax * t + bx) * t + cx) * t;
+  const sy = t => ((ay * t + by) * t + cy) * t;
+  const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+  return x => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const e = sx(t) - x, d = dx(t);
+      if (Math.abs(e) < 1e-5 || Math.abs(d) < 1e-6) break;
+      t -= e / d;
+    }
+    return sy(Math.min(1, Math.max(0, t)));
+  };
+}
+const spring = (x = 0) => ({ x, v: 0 });
+function springTo(s, target, sp, dt) {
+  s.v += (sp.w * sp.w * (target - s.x) - 2 * sp.z * sp.w * s.v) * dt;
+  s.x += s.v * dt;
+}
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+/* ════════════════════ 環境 ════════════════════ */
+const qs = new URLSearchParams(location.search);
+const seed = (+qs.get('seed')) || ((Math.random() * 1e9) | 0);
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rand = mulberry32(seed);
+
+const root = document.documentElement;
+const cv = document.getElementById('stage');
+const ctx = cv.getContext('2d');
+const mqDark = matchMedia('(prefers-color-scheme: dark)');
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = mqReduce.matches || qs.get('reduced') === '1';
+
+/* 釉組：每組都是完整的 5 色系統（Kiln / Umber / 主釉 A / 副釉 B / 強調 C），亮暗各自設計。
+   A = 主要陶石與 Keeper、按鈕；B = 第二種陶石；C = 強調色，並以「未燒透」的版本點綴最小的陶石。 */
+const GLAZES = {
+  mono:    { zh: '原色', en: 'Kiln',
+    light: { kiln: '#EFE8DD', umber: '#4A3A2E', clay: '#D9C7B0', b: null,      accent: '#C8643B' },
+    dark:  { kiln: '#1C1916', umber: '#EADFD1', clay: '#3A332C', b: null,      accent: '#E3804F' } },
+  celadon: { zh: '青瓷', en: 'Celadon',
+    light: { kiln: '#EFE8DD', umber: '#4A3A2E', clay: '#D9C7B0', b: '#AEBBA7', accent: '#C8643B' },
+    dark:  { kiln: '#1C1916', umber: '#EADFD1', clay: '#3A332C', b: '#2E3A33', accent: '#E3804F' } },
+  indigo:  { zh: '靛染', en: 'Indigo',
+    light: { kiln: '#ECEAE5', umber: '#242A3A', clay: '#D8D4CB', b: '#8497B3', accent: '#B9532F' },
+    dark:  { kiln: '#13161D', umber: '#E3E6EC', clay: '#2D313D', b: '#33415C', accent: '#E0795A' } },
+  matcha:  { zh: '抹茶', en: 'Matcha',
+    light: { kiln: '#EDEBE1', umber: '#2F3527', clay: '#D8D3BF', b: '#A3B384', accent: '#A8751E' },
+    dark:  { kiln: '#171913', umber: '#E7E7DA', clay: '#33352A', b: '#3B4730', accent: '#DDAE52' } },
+  sakura:  { zh: '櫻', en: 'Sakura',
+    light: { kiln: '#F2EAE7', umber: '#4A3236', clay: '#E3D2CC', b: '#D2A9A6', accent: '#8E3B48' },
+    dark:  { kiln: '#1D1617', umber: '#F0E2E0', clay: '#3B2F31', b: '#5B3F43', accent: '#DE7584' } },
+  sumi:    { zh: '墨', en: 'Sumi',
+    light: { kiln: '#EAE9E6', umber: '#1F1F1E', clay: '#D0CEC9', b: '#8E8C87', accent: '#9C7428' },
+    dark:  { kiln: '#131313', umber: '#E8E6E1', clay: '#2F2E2C', b: '#4B4946', accent: '#D2A552' } },
+};
+const GLAZE_IDS = Object.keys(GLAZES);
+const normGlaze = g => g === 'mixed' ? 'celadon' : (GLAZES[g] ? g : null);
+let glaze = 'mono';
+try { glaze = normGlaze(localStorage.getItem('dots-glaze')) || 'mono'; } catch (e) {}
+if (normGlaze(qs.get('glaze'))) glaze = normGlaze(qs.get('glaze'));
+
+let W = 0, H = 0, DPR = 1, R = 30, G = 1800;
+const FONT = '"Fraunces", Georgia, serif';
+
+/* ════════════════════ 色彩 ════════════════════ */
+let pal, look;
+const hex = h => { h = h.trim().replace('#', ''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const rgb = (c, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+function resolvedTheme() {
+  const d = root.dataset.theme;
+  return d === 'light' || d === 'dark' ? d : (mqDark.matches ? 'dark' : 'light');
+}
+function readPalette() {
+  const cs = getComputedStyle(root);
+  const g = n => hex(cs.getPropertyValue(n));
+  const dark = resolvedTheme() === 'dark';
+  pal = { kiln: g('--kiln'), clay: g('--clay'), umber: g('--umber'), ember: g('--ember'), ash: g('--ash') };
+  const set = GLAZES[glaze][dark ? 'dark' : 'light'];
+  pal.glazeB = set.b ? hex(set.b) : null;
+  pal.bright = dark ? pal.umber : pal.kiln;
+  pal.deep = dark ? pal.kiln : pal.umber;
+  look = dark
+    ? { dark, hl: 0.22, dk: 0.45, shA: 0.55, shB: 0.45, rim: 0.35, ao: 0.35, wt: 340 }
+    : { dark, hl: 0.38, dk: 0.22, shA: 0.22, shB: 0.35, rim: 0.15, ao: 0.18, wt: 400 };
+}
+
+/* ════════════════════ 材質 sprite：霧面陶土（唯一材質） ════════════════════ */
+let dotSprites = [], shadowSprite, bgCanvas;
+function buildSprites() {
+  // 釉色 0 = 主釉 A，1 = 副釉 B，2 = 強調色的「未燒透」版本（純強調色只留給 UI 焦點）：
+  // 亮色混主釉 35%，暗色混 Deep 45%
+  const bodies = pal.glazeB
+    ? [pal.clay, pal.glazeB, look.dark ? mix(pal.ember, pal.deep, 0.45) : mix(pal.ember, pal.clay, 0.35)]
+    : [pal.clay];
+  dotSprites = bodies.map(makeClaySprite);
+  buildShadowSprite();
+}
+function makeClaySprite(body) {
+  const S = 256, r = S / 2;
+  const c = document.createElement('canvas'); c.width = c.height = S;
+  const g = c.getContext('2d');
+  // 漫反射：光心偏左上 0.35r
+  const lx = r + LIGHT.x * Math.SQRT2 * 0.35 * r, ly = r + LIGHT.y * Math.SQRT2 * 0.35 * r;
+  const grd = g.createRadialGradient(lx, ly, 0, lx, ly, 1.55 * r);
+  grd.addColorStop(0, rgb(mix(body, pal.bright, look.hl)));
+  grd.addColorStop(0.5, rgb(body));
+  grd.addColorStop(1, rgb(mix(body, pal.deep, look.dk)));
+  g.fillStyle = grd; g.beginPath(); g.arc(r, r, r - 1, 0, TAU); g.fill();
+  // 顆粒 ±4%
+  const id = g.getImageData(0, 0, S, S), d = id.data, nr = mulberry32(7);
+  for (let i = 0; i < d.length; i += 4) {
+    if (!d[i + 3]) continue;
+    const n = (nr() - 0.5) * 2 * 0.04 * 255;
+    d[i] += n; d[i + 1] += n; d[i + 2] += n;
+  }
+  g.putImageData(id, 0, 0);
+  g.globalCompositeOperation = 'source-atop';
+  // 邊緣收邊（偏右下，遠離光）
+  const ao = g.createRadialGradient(r - 0.08 * r, r - 0.08 * r, r * 0.72, r - 0.08 * r, r - 0.08 * r, r * 1.1);
+  ao.addColorStop(0, rgb(pal.deep, 0)); ao.addColorStop(1, rgb(pal.deep, look.ao));
+  g.fillStyle = ao; g.fillRect(0, 0, S, S);
+  // 左上邊緣受光
+  const rim = g.createLinearGradient(0, 0, S, S);
+  rim.addColorStop(0.1, rgb(pal.bright, look.rim)); rim.addColorStop(0.42, rgb(pal.bright, 0));
+  g.strokeStyle = rim; g.lineWidth = S * 0.025;
+  g.beginPath(); g.arc(r, r, r - 1 - S * 0.0125, 0, TAU); g.stroke();
+  return c;
+}
+function buildShadowSprite() {
+  const S = 256, r = S / 2;
+
+  // 投影：Deep 色、軟邊
+  const s = document.createElement('canvas'); s.width = s.height = S;
+  const sg = s.getContext('2d');
+  const inner = (1 - look.shB) / (1 + look.shB);
+  const sgrd = sg.createRadialGradient(r, r, 0, r, r, r);
+  sgrd.addColorStop(0, rgb(pal.deep, 1)); sgrd.addColorStop(inner, rgb(pal.deep, 0.85)); sgrd.addColorStop(1, rgb(pal.deep, 0));
+  sg.fillStyle = sgrd; sg.fillRect(0, 0, S, S);
+  shadowSprite = s;
+}
+
+function buildBackground() {
+  bgCanvas = document.createElement('canvas');
+  bgCanvas.width = Math.ceil(W * DPR); bgCanvas.height = Math.ceil(H * DPR);
+  const g = bgCanvas.getContext('2d');
+  g.scale(DPR, DPR);
+  g.fillStyle = rgb(pal.kiln); g.fillRect(0, 0, W, H);
+  // 桌面受光：左上最亮，往右下極輕微沉下（同一道光）
+  const lin = g.createLinearGradient(0, 0, W, H);
+  lin.addColorStop(0, rgb(pal.bright, look.dark ? 0.0 : 0.25));
+  lin.addColorStop(1, rgb(pal.deep, look.dark ? 0.25 : 0.05));
+  g.fillStyle = lin; g.fillRect(0, 0, W, H);
+  if (look.dark) {
+    // 夜窯：時鐘後方的餘溫光池（Clay 暈開）
+    const pool = g.createRadialGradient(clock.cx, clock.cy, 0, clock.cx, clock.cy, Math.max(W, H) * 0.55);
+    pool.addColorStop(0, rgb(pal.clay, 0.55)); pool.addColorStop(1, rgb(pal.clay, 0));
+    g.fillStyle = pool; g.fillRect(0, 0, W, H);
+  }
+}
+
+/* ════════════════════ 時鐘（凹槽） ════════════════════ */
+const clock = {
+  cx: 0, cy: 0, fs: 122, slot: 0, colon: 0, asc: 0,
+  hwCap: 0, crCap: 0, crCircle: 0,
+  hw: spring(0), cr: spring(0), pad: FS.f0 * 2.6,
+  cache: null, cacheKey: '',
+};
+function clockFont(fs = clock.fs) { return `${look.wt} ${fs}px ${FONT}`; }
+function layoutClock() {
+  clock.cx = W / 2;
+  const tiers = [FS.f6, FS.f5, FS.f4, FS.f3];
+  for (const fs of tiers) {
+    ctx.font = clockFont(fs);
+    let slot = 0; for (let i = 0; i < 10; i++) slot = Math.max(slot, ctx.measureText(String(i)).width);
+    const colon = ctx.measureText(':').width * 1.25;
+    const textW = slot * 4 + colon;
+    const cr = fs * 0.74;
+    const total = textW + fs * 0.3 + cr * 2;
+    if ((total <= W * 0.86 && cr * 2 + 170 <= H * 0.7) || fs === FS.f3) {
+      Object.assign(clock, { fs, slot, colon, crCap: cr, hwCap: textW / 2 + fs * 0.15, crCircle: fs * 0.86 });
+      clock.asc = ctx.measureText('0').actualBoundingBoxAscent || fs * 0.7;
+      break;
+    }
+  }
+  clock.cy = Math.round(H * 0.44);
+  if (!clock.hw.x) { clock.hw.x = clock.hwCap; clock.cr.x = clock.crCap; }
+  clock.cacheKey = '';
+}
+function capsulePath(g, cx, cy, hw, cr, fresh = true) {
+  if (fresh) g.beginPath();
+  g.moveTo(cx - hw, cy - cr); g.lineTo(cx + hw, cy - cr);
+  g.arc(cx + hw, cy, cr, -Math.PI / 2, Math.PI / 2);
+  g.lineTo(cx - hw, cy + cr);
+  g.arc(cx - hw, cy, cr, Math.PI / 2, Math.PI * 1.5);
+  g.closePath();
+}
+// 凹陷：左上內陰影（Deep），右下內壁受光（Bright）
+function drawRecess(g, cx, cy, hw, cr, k = 1) {
+  g.save();
+  capsulePath(g, cx, cy, hw, cr);
+  g.fillStyle = rgb(pal.kiln); g.fill();
+  g.clip();
+  const ring = () => {
+    g.beginPath();
+    g.rect(cx - hw - cr * 4, cy - cr * 4, (hw + cr * 4) * 2, cr * 8);
+    capsulePath(g, cx, cy, hw, cr, false);
+  };
+  const u = Math.min(cr, 60) * k;
+  g.fillStyle = rgb(pal.deep);
+  g.shadowColor = rgb(pal.deep, Math.min(0.85, look.shA * 1.6));
+  g.shadowBlur = u * 0.32 * DPR; g.shadowOffsetX = -LIGHT.x * u * 0.1 * DPR; g.shadowOffsetY = -LIGHT.y * u * 0.12 * DPR;
+  ring(); g.fill('evenodd');
+  g.shadowColor = rgb(pal.bright, look.dark ? 0.22 : 0.75);
+  g.shadowBlur = u * 0.16 * DPR; g.shadowOffsetX = LIGHT.x * u * 0.06 * DPR; g.shadowOffsetY = LIGHT.y * u * 0.06 * DPR;
+  ring(); g.fill('evenodd');
+  g.restore();
+}
+function drawClockPlate() {
+  const hw = Math.max(0, clock.hw.x), cr = clock.cr.x;
+  const key = `${hw.toFixed(1)}|${cr.toFixed(1)}|${W}|${H}|${look.dark}`;
+  if (key !== clock.cacheKey) {
+    const pad = Math.ceil(cr * 0.5);
+    const w = Math.ceil((hw + cr) * 2 + pad * 2), h = Math.ceil(cr * 2 + pad * 2);
+    const c = clock.cache && clock.cache.width >= w * DPR && clock.cache.height >= h * DPR ? clock.cache : document.createElement('canvas');
+    if (c !== clock.cache) { c.width = Math.ceil(w * DPR); c.height = Math.ceil(h * DPR); }
+    const g = c.getContext('2d');
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height);
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    drawRecess(g, w / 2, h / 2, hw, cr);
+    clock.cache = c; clock.cacheKey = key; clock.cacheW = w; clock.cacheH = h;
+  }
+  ctx.drawImage(clock.cache, 0, 0, clock.cacheW * DPR, clock.cacheH * DPR,
+    clock.cx - clock.cacheW / 2, clock.cy - clock.cacheH / 2, clock.cacheW, clock.cacheH);
+}
+function drawEngraved(text, x, y, color) {
+  // 雕刻字：右下 1px 受光邊
+  ctx.fillStyle = rgb(pal.bright, look.dark ? 0.12 : 0.9);
+  ctx.fillText(text, x + 1, y + 1);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+}
+function drawDigits(str, color, alpha = 1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = clockFont(); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  const widths = [...str].map(ch => ch === ':' ? clock.colon : clock.slot);
+  let x = clock.cx - widths.reduce((a, b) => a + b, 0) / 2;
+  const y = clock.cy + clock.asc / 2;
+  [...str].forEach((ch, i) => {
+    const cy = ch === ':' ? y - clock.fs * 0.06 : y;
+    drawEngraved(ch, x + widths[i] / 2, cy, color);
+    x += widths[i];
+  });
+  ctx.restore();
+}
+function drawLabel(text) {
+  ctx.save();
+  ctx.font = `500 ${FS.f0}px ${FONT}`;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = `${FS.f0 * 0.14}px`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillStyle = rgb(pal.ash);
+  ctx.fillText(text.toUpperCase(), clock.cx, clock.cy + clock.cr.x + clock.pad * 0.36);
+  ctx.restore();
+}
+
+/* ════════════════════ 陶石 ════════════════════ */
+let dots = [];
+let keeper = null;
+function pickLevel() {
+  let r = rand(), acc = 0;
+  for (let i = 0; i < SIZE_WEIGHTS.length; i++) { acc += SIZE_WEIGHTS[i]; if (r <= acc) return i; }
+  return SIZE_STEPS.length - 1;
+}
+function targetCount() {
+  const avgA = SIZE_STEPS.reduce((a, s, i) => a + SIZE_WEIGHTS[i] * s * s, 0) * Math.PI * R * R;
+  return clamp(Math.round(W * H * 0.14 / avgA), 12, 64);
+}
+function clockDist(x, y) {
+  const px = clamp(x, clock.cx - Math.max(0, clock.hw.x), clock.cx + Math.max(0, clock.hw.x));
+  return Math.hypot(x - px, y - clock.cy) - clock.cr.x - clock.pad;
+}
+function place(d) {
+  for (let k = 0; k < 80; k++) {
+    const x = d.r + rand() * (W - 2 * d.r), y = d.r + rand() * (H - 2 * d.r);
+    if (clockDist(x, y) < d.r + 10) continue;
+    if (dots.some(o => o !== d && Math.hypot(o.x - x, o.y - y) < o.r + d.r + 4)) continue;
+    d.x = x; d.y = y; return;
+  }
+  d.x = d.r + rand() * (W - 2 * d.r); d.y = d.r + rand() * (H * 0.2);
+}
+const glazeRand = mulberry32(seed ^ 0x9E3779B9);
+function pickGlaze(level) {
+  const u = glazeRand();
+  if (level >= 2 && u < 0.28) return 2;   // 赤陶只出現在小顆，當作點綴而非焦點
+  return u < 0.62 ? 0 : 1;
+}
+function makeDot(level) {
+  const d = {
+    level, r: R * SIZE_STEPS[level], x: 0, y: 0, vx: 0, vy: 0, m: 1,
+    q: 0, qv: 0, qa: 0, p1: rand() * TAU, p2: rand() * TAU,
+    slot: null, releaseAt: Infinity, grounded: false, lift: spring(0), glaze: pickGlaze(level),
+  };
+  d.m = d.r * d.r;
+  return d;
+}
+function syncDots() {
+  const n = targetCount();
+  if (!keeper) { keeper = makeDot(0); keeper.keeper = true; keeper.glaze = 0; keeper.face = makeFace('keeper'); dots.push(keeper); place(keeper); }
+  while (dots.length > n) dots.pop();
+  while (dots.length < n) { const d = makeDot(pickLevel()); dots.push(d); place(d); }
+  for (const d of dots) {
+    d.r = R * SIZE_STEPS[d.level]; d.m = d.r * d.r;
+    d.x = clamp(d.x, d.r, W - d.r); d.y = clamp(d.y, d.r, H - d.r);
+  }
+  assignFaces();
+}
+
+/* Keeper 的眼睛：Settle spring 驅動 */
+/* 臉：Keeper 是隊長，其餘是個性不同的夥伴。每張臉的眼睛都由 Settle spring 驅動 */
+const makeFace = persona => ({ persona, open: spring(1), tall: spring(1), gx: spring(0), gy: spring(0), smile: spring(0),
+  nextBlink: performance.now() + 800 + rand() * 4000, blinkEnd: 0, happyUntil: 0 });
+const PERSONAS = ['curious', 'sleepy', 'follower', 'shy'];   // 好奇、愛睏、跟班、害羞
+const FACE_OPTIONS = [1, 5, 12];
+let faceCount = 5;
+try { const v = +localStorage.getItem('dots-faces'); if (FACE_OPTIONS.includes(v)) faceCount = v; } catch (e) {}
+if (FACE_OPTIONS.includes(+qs.get('faces'))) faceCount = +qs.get('faces');
+let performer = null;            // { dot, until }：正在表演的那一顆，其他臉會看向它
+let labelNote = null;            // { text, until }：暫時取代狀態標籤的提示
+function assignFaces() {
+  // 夥伴優先挑大顆（眼睛才讀得清楚），依陣列順序決定，切換數量時不會亂換人
+  const want = Math.min(faceCount - 1, dots.length - 1);
+  const pool = dots.filter(d => d !== keeper && d.level <= 2).sort((a, b) => a.level - b.level || dots.indexOf(a) - dots.indexOf(b));
+  const chosen = new Set(pool.slice(0, want));
+  let i = 0;
+  for (const d of dots) {
+    if (d === keeper) continue;
+    if (chosen.has(d)) { if (!d.face) d.face = makeFace(PERSONAS[i % PERSONAS.length]); i++; }
+    else d.face = null;
+  }
+}
+
+/* ════════════════════ 倒數 ════════════════════ */
+const timer = { dur: 300000, state: 'ready', endAt: 0, rem: 300000 };
+const initial = parseFloat(qs.get('t'));
+if (initial > 0) { timer.dur = timer.rem = Math.round(clamp(initial, 1, 5999)) * 1000; }
+function remaining(now) { return timer.state === 'running' ? Math.max(0, timer.endAt - now) : timer.rem; }
+function fmt(ms) { const s = Math.ceil(ms / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+function start() {
+  const now = performance.now();
+  if (timer.state === 'running') return;
+  if (timer.state === 'done' || timer.state === 'ready') timer.rem = timer.dur;
+  timer.endAt = now + timer.rem; timer.state = 'running';
+  updateUI(); announce(`開始，剩餘 ${fmt(timer.rem)}`);
+}
+function pause() {
+  if (timer.state !== 'running') return;
+  timer.rem = Math.max(0, timer.endAt - performance.now()); timer.state = 'paused';
+  updateUI(); announce('已暫停');
+}
+function reset() { timer.state = 'ready'; timer.rem = timer.dur; updateUI(); announce('已重設'); }
+function setDuration(ms, go) {
+  timer.dur = clamp(ms, 1000, 5999000); timer.state = 'ready'; timer.rem = timer.dur;
+  if (go) start(); else updateUI();
+}
+function sceneMode(now) {
+  if (timer.state === 'paused') return 'sleeping';
+  if (timer.state === 'done') return 'down';
+  if (timer.state === 'running' && remaining(now) <= 10000) return 'alert';
+  return 'idle';
+}
+
+/* ════════════════════ 場景狀態 ════════════════════ */
+let mode = 'idle', modeSince = 0;
+const grav = spring(0);          // 重力比例 0..1
+const pulse = spring(0);         // 最後 10 秒的秒脈動
+const dim = spring(0);           // 熄窯暈影
+let ringOuter = 0, ringSpin = 0, lastSecond = -1, lastMinute = -1;
+let breath = null;               // { t0 }
+let ripple = null;               // { x, y, t0, R }
+let well = null;                 // { x, y, depth: spring }
+let particles = [];
+
+function assignRings() {
+  for (const d of dots) d.slot = null;
+  const sorted = [keeper, ...dots.filter(d => d !== keeper).sort((a, b) => b.r - a.r)];
+  const maxR = Math.min(W, H) / 2 - 8, gap = R * 0.14;
+  let idx = 0, inner = clock.crCircle + clock.pad;
+  for (let k = 0; k < 2 && idx < sorted.length; k++) {
+    const rmax = sorted[idx].r, rho = inner + rmax + gap;
+    if (rho + rmax > maxR && k > 0) break;
+    // 以弦長計算每顆石頭佔的角度，保證不重疊
+    const span = d => 2 * Math.asin(Math.min(1, (d.r + gap / 2) / rho));
+    const members = []; let used = 0;
+    while (idx < sorted.length && used + span(sorted[idx]) <= TAU) { used += span(sorted[idx]); members.push(sorted[idx++]); }
+    const extra = (TAU - used) / Math.max(1, members.length);
+    // 依目前方位角排序：每顆石頭走最短路徑入座，不必互相穿越
+    const ang = d => Math.atan2(d.y - clock.cy, d.x - clock.cx);
+    members.sort((p, q) => ang(p) - ang(q));
+    let a = ang(members[0]) - (span(members[0]) + extra) / 2;
+    for (const d of members) { const sp = span(d) + extra; d.slot = { k, rho, a: a + sp / 2 }; a += sp; }
+    inner = rho + rmax;
+  }
+  ringOuter = inner + gap;
+}
+function assignRelease(now) {
+  const ring = dots.filter(d => d.slot && d !== keeper).sort((a, b) => a.slot.k - b.slot.k || a.slot.a - b.slot.a);
+  for (const d of dots) { d.releaseAt = now; d.grounded = false; }
+  ring.forEach((d, i) => d.releaseAt = now + T.t4 + i * T.t1);
+  keeper.releaseAt = now + T.t4 + ring.length * T.t1 + T.t3;
+}
+function onModeChange(prev, next, now) {
+  modeSince = now;
+  if (next === 'alert') { assignRings(); }
+  if (next === 'down') { if (prev !== 'alert') assignRings(); assignRelease(now); }
+  if (next !== 'alert' && next !== 'down') for (const d of dots) d.slot = null;
+  if ((prev === 'sleeping' || prev === 'down') && (next === 'idle' || next === 'alert') && !reduced) {
+    // 醒來：由下而上依序被托起
+    const order = [...dots].sort((a, b) => b.y - a.y);
+    order.forEach((d, i) => setTimeout(() => { d.vy -= 260 + rand() * 220; d.qv += 0.9; }, Math.min(i * 18, T.t4)));
+  }
+  if (next !== 'down') for (const d of dots) d.releaseAt = Infinity;
+  ripple = null; breath = null;
+}
+
+/* ════════════════════ 物理 ════════════════════ */
+let drag = null;   // { dot, x, y, vx, vy, t0, moved }
+let pointer = { x: 0, y: 0, t: -1e9 };
+
+function impact(d, speed, nx, ny, px, py) {
+  if (reduced || speed < 40) return;
+  d.qv += Math.min(speed * 0.0011, 1.6);
+  d.qa = Math.atan2(ny, nx);
+  if (speed > 780 && particles.length < MAX_PARTICLES) emitDust(px, py, 3);
+}
+function emitDust(x, y, n) {
+  for (let i = 0; i < n && particles.length < MAX_PARTICLES; i++) {
+    const a = -Math.PI / 2 + (rand() - 0.5) * 2.2;
+    const s = 60 + rand() * 140;
+    particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, r: R * (0.05 + rand() * 0.05), t0: performance.now() });
+  }
+}
+
+function step(dt, now) {
+  const gTarget = reduced || mode === 'sleeping' || mode === 'down' ? 1 : 0;
+  springTo(grav, gTarget, SPRING_SETTLE, dt);
+  const circle = mode === 'alert' && !reduced;
+  springTo(clock.hw, circle ? 0 : clock.hwCap, SPRING_SETTLE, dt);
+  springTo(clock.cr, circle ? clock.crCircle : clock.crCap, SPRING_SETTLE, dt);
+  if (reduced) { clock.hw.x = circle ? 0 : clock.hwCap; clock.cr.x = circle ? clock.crCircle : clock.crCap; }
+  springTo(pulse, 0, SPRING_CLAY, dt);
+  springTo(dim, mode === 'down' ? 1 : 0, SPRING_SETTLE, dt);
+  if (well) springTo(well.depth, 1, SPRING_SETTLE, dt);
+  ringSpin += dt * 0.12;
+
+  let breathK = 0;
+  if (breath) {
+    const p = (now - breath.t0) / T.t4;
+    if (p >= 1) breath = null;
+    else breathK = p < 0.5 ? kilnEase(p * 2) : 1 - kilnEase((p - 0.5) * 2);
+  }
+
+  for (const d of dots) {
+    springTo(d.lift, drag && drag.dot === d ? 1 : 0, SPRING_SETTLE, dt);
+    // 壓扁彈簧（Clay）
+    d.qv += (-SPRING_CLAY.w * SPRING_CLAY.w * d.q - 2 * SPRING_CLAY.z * SPRING_CLAY.w * d.qv) * dt;
+    d.q = clamp(d.q + d.qv * dt, -MATERIAL.squashMax, MATERIAL.squashMax);
+    if (reduced) { d.q = 0; d.qv = 0; }
+
+    if (drag && drag.dot === d) {
+      d.vx = (drag.x - d.x) * 18; d.vy = (drag.y - d.y) * 18;
+      d.x += d.vx * dt; d.y += d.vy * dt;
+      continue;
+    }
+    let ax = 0, ay = 0, damp = 0.6;
+    if (reduced) { ay = G; damp = 3; }
+    else if (mode === 'idle') {
+      ax = Math.sin(now * 0.00031 + d.p1) * 16 + Math.sin(now * 0.00013 + d.p2) * 10;
+      ay = Math.cos(now * 0.00023 + d.p2) * 16 + Math.cos(now * 0.00011 + d.p1) * 10;
+      ay += G * grav.x;
+      damp = 0.6 + grav.x;
+    } else if (mode === 'sleeping') {
+      ay = G * grav.x; damp = 1.4;
+    } else if (mode === 'alert' || (mode === 'down' && now < d.releaseAt)) {
+      if (d.slot) {
+        const dir = d.slot.k % 2 ? -1 : 1;
+        const a = d.slot.a + ringSpin * dir;
+        const rho = d.slot.rho * (1 + pulse.x * 0.05);
+        const tx = clock.cx + Math.cos(a) * rho, ty = clock.cy + Math.sin(a) * rho;
+        const w = SPRING_SETTLE.w;
+        ax = w * w * (tx - d.x); ay = w * w * (ty - d.y);
+        damp = 2 * SPRING_SETTLE.z * w;
+      } else {
+        // 沒入環的陶石讓出環帶，停在外側
+        const dx = d.x - clock.cx, dy = d.y - clock.cy, l = Math.hypot(dx, dy) || 1;
+        const want = ringOuter + d.r + R * 0.3, w = SPRING_SETTLE.w;
+        if (l < want) { ax = dx / l * w * w * (want - l); ay = dy / l * w * w * (want - l); damp = 2 * w; }
+        else damp = 3.2;
+      }
+    } else if (mode === 'down') {
+      ay = G; damp = 0.35;
+    }
+    if (breathK) {
+      const dx = clock.cx - d.x, dy = clock.cy - d.y, l = Math.hypot(dx, dy) || 1;
+      ax += dx / l * 420 * breathK; ay += dy / l * 420 * breathK;
+    }
+    if (well && !reduced) {
+      const dx = well.x - d.x, dy = well.y - d.y, l = Math.hypot(dx, dy) || 1;
+      const f = 2600 * Math.min(1, 260 / l);
+      ax += dx / l * f; ay += dy / l * f; damp = Math.max(damp, 1.6);
+    }
+    d.vx += ax * dt; d.vy += ay * dt;
+    const k = Math.max(0, 1 - damp * dt);
+    d.vx *= k; d.vy *= k;
+    const sp = Math.hypot(d.vx, d.vy);
+    if (sp > 2600) { d.vx *= 2600 / sp; d.vy *= 2600 / sp; }
+    d.x += d.vx * dt; d.y += d.vy * dt;
+  }
+  collide();
+  // 粒子
+  for (const p of particles) { p.vy += G * 0.35 * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
+  particles = particles.filter(p => now - p.t0 < T.t4 && p.y < H + 10);
+}
+
+function capsuleHit(d, cx, cy, hw, cr, it) {
+  const px = clamp(d.x, cx - hw, cx + hw);
+  const dx = d.x - px, dy = d.y - cy, dist = Math.hypot(dx, dy), min = cr + d.r;
+  if (dist >= min) return;
+  const nx = dist ? dx / dist : 0, ny = dist ? dy / dist : -1;
+  d.x = px + nx * min; d.y = cy + ny * min;
+  const vn = d.vx * nx + d.vy * ny;
+  if (vn < 0) {
+    if (it === 0) impact(d, -vn, nx, ny, px + nx * cr, cy + ny * cr);
+    d.vx -= (1 + MATERIAL.eClock) * vn * nx; d.vy -= (1 + MATERIAL.eClock) * vn * ny;
+  }
+  // 停在平頂上時沿切線滑落，不會卡住
+  if (ny < -0.9 && grav.x > 0.5 && hw > 0) d.vx += Math.sign(d.x - cx || 1) * G * 0.25 * FIXED_DT;
+}
+let obstacles = [];
+function readObstacles() {
+  obstacles = [];
+  const add = el => {
+    const b = el.getBoundingClientRect();
+    if (!b.width) return;
+    const cr = b.height / 2 + 2;
+    obstacles.push({ cx: b.left + b.width / 2, cy: b.top + b.height / 2, hw: Math.max(0, b.width / 2 - b.height / 2), cr });
+  };
+  if (!bar.classList.contains('hidden')) bar.querySelectorAll('.clay, .field').forEach(add);
+  add(themeBtn); add(glazeBtn); add(facesBtn);
+  if (tray.classList.contains('open')) add(tray);
+}
+function collide() {
+  const n = dots.length;
+  for (let it = 0; it < 2; it++) {
+    for (let i = 0; i < n; i++) {
+      const a = dots[i];
+      for (let j = i + 1; j < n; j++) {
+        const b = dots[j];
+        const rr = a.r + b.r, dx = b.x - a.x;
+        if (dx > rr || dx < -rr) continue;
+        const dy = b.y - a.y;
+        if (dy > rr || dy < -rr) continue;
+        const d2 = dx * dx + dy * dy;
+        if (d2 >= rr * rr) continue;
+        const d = Math.sqrt(d2) || 0.01, nx = dx / d, ny = dy / d, pen = rr - d;
+        const ia = drag && drag.dot === a ? 0 : 1 / a.m, ib = drag && drag.dot === b ? 0 : 1 / b.m;
+        const sum = ia + ib; if (!sum) continue;
+        a.x -= nx * pen * ia / sum; a.y -= ny * pen * ia / sum;
+        b.x += nx * pen * ib / sum; b.y += ny * pen * ib / sum;
+        const vn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+        if (vn < 0) {
+          const jmp = -(1 + MATERIAL.eDot) * vn / sum;
+          a.vx -= jmp * nx * ia; a.vy -= jmp * ny * ia;
+          b.vx += jmp * nx * ib; b.vy += jmp * ny * ib;
+          if (it === 0) {
+            const px = a.x + nx * a.r, py = a.y + ny * a.r;
+            impact(a, -vn, nx, ny, px, py); impact(b, -vn, nx, ny, px, py);
+          }
+        }
+      }
+    }
+    for (const d of dots) {
+      if (drag && drag.dot === d) { d.x = clamp(d.x, d.r, W - d.r); d.y = clamp(d.y, d.r, H - d.r); continue; }
+      // 牆
+      if (d.x < d.r) { d.x = d.r; if (d.vx < 0) { if (it === 0) impact(d, -d.vx, 1, 0, 0, d.y); d.vx = -d.vx * MATERIAL.eWall; } }
+      if (d.x > W - d.r) { d.x = W - d.r; if (d.vx > 0) { if (it === 0) impact(d, d.vx, 1, 0, W, d.y); d.vx = -d.vx * MATERIAL.eWall; } }
+      if (d.y < d.r) { d.y = d.r; if (d.vy < 0) { if (it === 0) impact(d, -d.vy, 0, 1, d.x, 0); d.vy = -d.vy * MATERIAL.eWall; } }
+      if (d.y > H - d.r) {
+        d.y = H - d.r;
+        if (d.vy > 0) {
+          if (it === 0) {
+            impact(d, d.vy, 0, 1, d.x, H);
+            if (mode === 'down' && !d.grounded && d.vy > 300 && !reduced) emitDust(d.x, H - 2, 2);
+          }
+          d.vy = -d.vy * MATERIAL.eWall; d.vx *= 0.92;
+        }
+        if (mode === 'down') d.grounded = true;
+      }
+      // 時鐘（膠囊凹槽 + 留白）與 UI 陶土（同一個世界的實體）
+      capsuleHit(d, clock.cx, clock.cy, Math.max(0, clock.hw.x), clock.cr.x + clock.pad, it);
+      for (const o of obstacles) capsuleHit(d, o.cx, o.cy, o.hw, o.cr, it);
+    }
+  }
+}
+
+/* ════════════════════ 繪製 ════════════════════ */
+function squashMatrix(d, s) {
+  const q = d.q, a = (1 - q) * s, b = (1 + q * 0.55) * s;
+  const c = Math.cos(d.qa), sn = Math.sin(d.qa);
+  // R(θ)·diag(a,b)·R(−θ)：對稱矩陣，高光不會跟著旋轉
+  return [a * c * c + b * sn * sn, (a - b) * c * sn, (a - b) * c * sn, a * sn * sn + b * c * c];
+}
+function drawShadow(d) {
+  const lift = d.lift.x;
+  const off = 1 + lift * 1.6, blur = 1 + look.shB + lift * 0.4;
+  const rs = d.r * blur;
+  const x = d.x - LIGHT.x * d.r * 0.18 * off * Math.SQRT2, y = d.y - LIGHT.y * d.r * 0.22 * off * Math.SQRT2;
+  ctx.globalAlpha = look.shA * (1 - lift * 0.35);
+  ctx.drawImage(shadowSprite, x - rs, y - rs, rs * 2, rs * 2);
+}
+function drawBody(d) {
+  const m = squashMatrix(d, 1 + d.lift.x * 0.06);
+  ctx.setTransform(m[0] * DPR, m[1] * DPR, m[2] * DPR, m[3] * DPR, d.x * DPR, d.y * DPR);
+  ctx.drawImage(dotSprites[d.glaze] || dotSprites[0], -d.r, -d.r, d.r * 2, d.r * 2);
+  if (d.face) drawEyes(d.face, d.r, d === keeper ? 1 : 0.88);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+function drawEyes(eye, r, k) {
+  // k：夥伴的眼睛略小（0.88），保持 Keeper 的焦點地位
+  const open = clamp(eye.open.x, 0, 1.3), tall = eye.tall.x * k, smile = clamp(eye.smile.x, 0, 1);
+  const gx = eye.gx.x * r * 0.16, gy = eye.gy.x * r * 0.12 - r * 0.04;
+  const ew = r * 0.13 * k, gap = r * 0.23;
+  ctx.fillStyle = rgb(pal.umber); ctx.strokeStyle = rgb(pal.umber);
+  ctx.lineCap = 'round'; ctx.lineWidth = r * 0.075;
+  for (const s of [-1, 1]) {
+    const x = gx + s * gap, y = gy;
+    if (smile > 0.5) {                           // 滿足：向上的弧
+      ctx.lineWidth = r * 0.06;
+      ctx.beginPath(); ctx.arc(x, y + r * 0.1, r * 0.13, Math.PI * 1.12, Math.PI * 1.88); ctx.stroke();
+      continue;
+    }
+    const eh = r * 0.36 * open * tall;
+    if (eh <= ew) {                               // 闔眼：一條線
+      ctx.beginPath(); ctx.moveTo(x - r * 0.08, y + r * 0.03); ctx.lineTo(x + r * 0.08, y + r * 0.03); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(x - ew / 2, y - eh / 2, ew, eh, ew / 2); ctx.fill();
+    }
+  }
+}
+function drawWell() {
+  if (!well) return;
+  const k = clamp(well.depth.x, 0, 1.2), cr = R * 0.55 * k;
+  if (cr < 1) return;
+  drawRecess(ctx, well.x, well.y, 0, cr, 0.6);
+}
+function drawRipple(now) {
+  if (!ripple) return;
+  const p = (now - ripple.t0) / T.t4;
+  if (p >= 1) { ripple = null; return; }
+  const e = kilnEase(p);
+  ctx.globalAlpha = (1 - e) * 0.7;
+  ctx.strokeStyle = rgb(pal.ash); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(ripple.x, ripple.y, ripple.R * e, 0, TAU); ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+function drawParticles(now) {
+  ctx.fillStyle = rgb(pal.ash);
+  for (const p of particles) {
+    ctx.globalAlpha = 1 - kilnEase((now - p.t0) / T.t4);
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawVignette() {
+  const k = clamp(dim.x, 0, 1);
+  if (k < 0.01) return;
+  const g = ctx.createRadialGradient(clock.cx, clock.cy, Math.min(W, H) * 0.25, clock.cx, clock.cy, Math.hypot(W, H) * 0.62);
+  g.addColorStop(0, rgb(pal.deep, 0)); g.addColorStop(1, rgb(pal.deep, (look.dark ? 0.6 : 0.2) * k));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+
+function render(now) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(bgCanvas, 0, 0);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  // 時鐘
+  drawClockPlate();
+  const rem = remaining(now);
+  const alert = mode === 'alert';
+  const circleK = clamp(1 - Math.max(0, clock.hw.x) / clock.hwCap, 0, 1);
+  if (alert || (circleK > 0.02 && mode !== 'down')) {
+    const s = String(Math.ceil(rem / 1000));
+    if (circleK < 0.98 && !reduced) drawDigits(fmt(rem), rgb(pal.umber), 1 - kilnEase(circleK));
+    drawDigits(s, rgb(pal.ember), reduced ? 1 : kilnEase(circleK));
+  } else {
+    drawDigits(fmt(rem), rgb(pal.umber));
+    if (timer.state !== 'done' && circleK < 0.02) {   // 進度：剩餘長度
+      const hw = clock.hwCap, frac = rem / timer.dur;
+      ctx.strokeStyle = rgb(pal.ash); ctx.lineWidth = 2; ctx.lineCap = 'round';
+      const y = clock.cy + clock.cr.x * 0.66;
+      ctx.beginPath(); ctx.moveTo(clock.cx - hw, y); ctx.lineTo(clock.cx - hw + hw * 2 * frac, y); ctx.stroke();
+    }
+  }
+  const label = { ready: 'ready', running: 'remaining', paused: 'paused', done: 'done' }[timer.state];
+  drawLabel(labelNote && now < labelNote.until ? labelNote.text : label);
+
+  drawWell();
+  for (const d of dots) drawShadow(d);
+  ctx.globalAlpha = 1;
+  drawParticles(now);            // 粉塵落在桌面層，永遠在陶石之下（避免被誤讀成臉）
+  const top = drag && drag.dot;
+  for (const d of dots) if (d !== top) drawBody(d);
+  if (top) drawBody(top);
+  drawRipple(now);
+  drawVignette();
+}
+
+/* 臉的情緒：模式決定大方向，個性決定細節；有人在表演時，其他臉都看向它（群體把焦點讓出來） */
+function updateEyes(dt, now) {
+  if (performer && now > performer.until) performer = null;
+  if (drag) performer = { dot: drag.dot, until: now + T.t4 };
+  for (const d of dots) if (d.face) updateFace(d, d.face, dt, now);
+}
+function updateFace(d, eye, dt, now) {
+  const p = eye.persona, isStar = performer && performer.dot === d;
+  let open = 1, tall = 1, smile = 0;
+  if (p === 'sleepy' && mode === 'idle') open = 0.55;           // 半睜眼
+  if (mode === 'sleeping') open = 0;
+  if (mode === 'alert') tall = 1.25;
+  if (mode === 'down' && now > d.releaseAt + T.t4 && Math.hypot(d.vx, d.vy) < 80) smile = 1;   // 落定後滿足地闔眼
+  if (now < eye.happyUntil) smile = 1;
+  if (!reduced && open > 0 && now > eye.nextBlink) {
+    eye.blinkEnd = now + T.t2;
+    eye.nextBlink = now + (p === 'sleepy' ? 1800 : 2600) + rand() * 3800;
+  }
+  if (now < eye.blinkEnd) open = 0;
+
+  // 視線
+  const pointerLive = drag || well || now - pointer.t < 2400;
+  let tx = clock.cx, ty = clock.cy, gain = 1;
+  if (mode === 'alert') { /* 全員盯著時鐘 */ }
+  else if (performer && !isStar) { tx = performer.dot.x; ty = performer.dot.y; }
+  else if (p === 'keeper') { if (pointerLive) { tx = pointer.x; ty = pointer.y; } }
+  else if (p === 'curious') { if (now - pointer.t < 6000) { tx = pointer.x; ty = pointer.y; gain = 1.15; } }
+  else if (p === 'follower') { tx = keeper.x; ty = keeper.y; }
+  else if (p === 'shy') {
+    if (pointerLive && Math.hypot(pointer.x - d.x, pointer.y - d.y) < R * 4) {
+      tx = 2 * d.x - pointer.x; ty = 2 * d.y - pointer.y; tall *= 0.8;    // 別過頭、縮一下
+    }
+  }
+  if (drag && drag.dot === d) { tx = d.x + d.vx; ty = d.y + d.vy; }
+  const dx = tx - d.x, dy = ty - d.y, l = Math.hypot(dx, dy) || 1, f = Math.min(1, l / (R * 4)) * gain;
+  const S = reduced ? { w: 40, z: 1 } : SPRING_SETTLE;
+  // 閉眼快、眨完睜眼也俐落；從睡眠醒來才用較慢的 Settle
+  const openSp = open < eye.open.x ? { w: 28, z: 1 } : (mode === 'sleeping' || reduced ? S : { w: 18, z: 1 });
+  springTo(eye.open, open, openSp, dt);
+  springTo(eye.tall, tall, S, dt);
+  springTo(eye.smile, smile, S, dt);
+  springTo(eye.gx, dx / l * f, S, dt);
+  springTo(eye.gy, dy / l * f, S, dt);
+}
+
+/* ════════════════════ 迴圈 ════════════════════ */
+let last = performance.now(), acc = 0;
+function frame(now) {
+  // 計時
+  if (timer.state === 'running') {
+    const rem = remaining(now);
+    if (rem <= 0) { timer.state = 'done'; timer.rem = 0; updateUI(); announce('時間到'); }
+    else {
+      const sec = Math.ceil(rem / 1000), min = Math.floor((rem - 1) / 60000);
+      if (rem <= 10000 && sec !== lastSecond && lastSecond !== -1 && !reduced) pulse.v += 3.2;
+      if (rem > 10000 && min !== lastMinute && lastMinute !== -1 && !reduced && !well && !drag) { breath = { t0: now }; ripple = null; }
+      lastSecond = sec; lastMinute = min;
+    }
+  } else { lastSecond = -1; lastMinute = -1; }
+
+  const next = sceneMode(now);
+  if (next !== mode) { const prev = mode; mode = next; onModeChange(prev, next, now); }
+
+  readObstacles();
+  acc += Math.min(0.1, (now - last) / 1000); last = now;
+  let steps = 0;
+  while (acc >= FIXED_DT && steps < 6) { step(FIXED_DT, now); updateEyes(FIXED_DT, now); acc -= FIXED_DT; steps++; }
+  if (steps === 6) acc = 0;
+  render(now);
+  updateBarVisibility(now);
+  requestAnimationFrame(frame);
+}
+
+/* ════════════════════ 互動 ════════════════════ */
+function hitDot(x, y) {
+  let best = null, bd = Infinity;
+  for (const d of dots) { const l = Math.hypot(d.x - x, d.y - y); if (l < d.r * 1.15 && l < bd) { bd = l; best = d; } }
+  return best;
+}
+let press = null, longTimer = 0;
+cv.addEventListener('pointerdown', e => {
+  cv.setPointerCapture(e.pointerId);
+  const x = e.clientX, y = e.clientY, now = performance.now();
+  pointer = { x, y, t: now }; activity(now);
+  const d = hitDot(x, y);
+  press = { x, y, t0: now, dot: d, moved: false, lx: x, ly: y, lt: now, vx: 0, vy: 0 };
+  if (d) { drag = { dot: d, x, y }; cv.classList.add('grabbing'); ripple = null; breath = null; }
+  else if (!reduced) {
+    longTimer = setTimeout(() => { if (press && !press.moved) { well = { x: press.x, y: press.y, depth: spring(0) }; ripple = null; breath = null; } }, T.t3);
+  }
+});
+cv.addEventListener('pointermove', e => {
+  const x = e.clientX, y = e.clientY, now = performance.now();
+  pointer = { x, y, t: now }; activity(now);
+  if (!press) return;
+  if (Math.hypot(x - press.x, y - press.y) > 8) press.moved = true;
+  const dt = Math.max(1, now - press.lt) / 1000;
+  press.vx = press.vx * 0.5 + (x - press.lx) / dt * 0.5; press.vy = press.vy * 0.5 + (y - press.ly) / dt * 0.5;
+  press.lx = x; press.ly = y; press.lt = now;
+  if (drag) { drag.x = x; drag.y = y; }
+  if (well) { well.x = x; well.y = y; }
+});
+function endPress(e) {
+  clearTimeout(longTimer);
+  if (!press) return;
+  const now = performance.now(), tap = !press.moved && now - press.t0 < T.t3;
+  if (drag) {
+    const d = drag.dot;
+    if (tap && !reduced) {
+      if (d.face) { d.vy -= 620; d.qv += 1.6; d.qa = Math.PI / 2; d.face.happyUntil = now + T.t5; performer = { dot: d, until: now + T.t5 }; }
+      else { const a = Math.atan2(d.y - press.y, d.x - press.x); d.vx += Math.cos(a) * 180; d.vy += Math.sin(a) * 180 - 120; d.qv += 1.2; d.qa = Math.PI / 2; }
+    } else if (!reduced) { d.vx = clamp(press.vx, -2400, 2400); d.vy = clamp(press.vy, -2400, 2400); }
+    drag = null; cv.classList.remove('grabbing');
+  } else if (well) {
+    well = null;
+  } else if (tap && !reduced) {
+    const RR = Math.min(W, H) * 0.45;
+    ripple = { x: press.x, y: press.y, t0: now, R: RR }; breath = null;
+    for (const d of dots) {
+      const dx = d.x - press.x, dy = d.y - press.y, l = Math.hypot(dx, dy) || 1;
+      if (l > RR) continue;
+      const f = Math.pow(1 - l / RR, 2) * 950;
+      d.vx += dx / l * f; d.vy += dy / l * f;
+    }
+  }
+  press = null;
+}
+cv.addEventListener('pointerup', endPress);
+cv.addEventListener('pointercancel', endPress);
+
+/* ════════════════════ UI ════════════════════ */
+const bar = document.getElementById('bar');
+const playBtn = document.getElementById('play');
+const playIcon = document.getElementById('playIcon');
+const input = document.getElementById('custom');
+const live = document.getElementById('live');
+const themeBtn = document.getElementById('theme');
+const ICON_PLAY = '<path d="M8.5 6.2c0-1 1.1-1.6 2-1.1l8 5.3c.8.5.8 1.7 0 2.2l-8 5.3c-.9.6-2-.1-2-1.1z" fill="currentColor"/>';
+// 暫停圖示 = Keeper 的兩隻眼睛（同一個造型語彙）
+const ICON_PAUSE = '<rect x="7" y="5.5" width="3.4" height="13" rx="1.7" fill="currentColor"/><rect x="13.6" y="5.5" width="3.4" height="13" rx="1.7" fill="currentColor"/>';
+let lastActivity = performance.now();
+function activity(now) { lastActivity = now; }
+function announce(s) { live.textContent = s; }
+function updateUI() {
+  const running = timer.state === 'running';
+  playIcon.innerHTML = running ? ICON_PAUSE : ICON_PLAY;
+  playBtn.setAttribute('aria-label', running ? '暫停' : timer.state === 'paused' ? '繼續' : timer.state === 'done' ? '再來一次' : '開始');
+  playBtn.classList.toggle('paused', timer.state === 'paused');
+  document.querySelectorAll('.presets .clay').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.sec * 1000 === timer.dur)));
+  if (document.activeElement !== input) input.value = fmt(timer.dur);
+}
+function updateBarVisibility(now) {
+  const hide = !reduced && timer.state === 'running' && now - lastActivity > T.t5 && document.activeElement !== input && !bar.matches(':hover');
+  bar.classList.toggle('hidden', hide);
+}
+playBtn.addEventListener('click', () => timer.state === 'running' ? pause() : start());
+document.getElementById('reset').addEventListener('click', reset);
+document.querySelectorAll('.presets .clay').forEach(b => b.addEventListener('click', () => setDuration(+b.dataset.sec * 1000, true)));
+function parseDur(s) {
+  s = s.trim(); if (!s) return null;
+  let m = s.match(/^(\d{1,2})\s*[:：.'′]\s*(\d{1,2})$/);
+  if (m) return (+m[1] * 60 + Math.min(59, +m[2])) * 1000;
+  if (/^\d+(\.\d+)?$/.test(s)) return Math.round(parseFloat(s) * 60) * 1000;
+  return null;
+}
+input.addEventListener('keydown', e => {
+  e.stopPropagation();
+  if (e.key === 'Enter') { const ms = parseDur(input.value); if (ms) { setDuration(ms, true); input.blur(); } else input.value = fmt(timer.dur); }
+  if (e.key === 'Escape') { input.value = fmt(timer.dur); input.blur(); }
+});
+input.addEventListener('blur', () => { const ms = parseDur(input.value); if (ms && ms !== timer.dur) setDuration(ms, false); input.value = fmt(timer.dur); });
+addEventListener('keydown', e => {
+  activity(performance.now());
+  if (e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+  if (e.key === ' ') { e.preventDefault(); timer.state === 'running' ? pause() : start(); }
+  if (e.key === 'r' || e.key === 'R') reset();
+});
+addEventListener('pointermove', () => activity(performance.now()), { passive: true });
+
+const glazeBtn = document.getElementById('glaze');
+const tray = document.getElementById('tray');
+const trayLabel = document.getElementById('trayLabel');
+const chips = document.getElementById('chips');
+const TOKENS = ['--kiln', '--clay', '--umber', '--ember', '--ash'];
+function applyGlazeTokens() {
+  for (const t of TOKENS) root.style.removeProperty(t);
+  if (glaze === 'mono') return;               // 原色：完全沿用 CSS 的 token
+  const set = GLAZES[glaze][resolvedTheme()];
+  root.style.setProperty('--kiln', set.kiln);
+  root.style.setProperty('--clay', set.clay);
+  root.style.setProperty('--umber', set.umber);
+  root.style.setProperty('--ember', set.accent);
+  // Ash 不是具名色：Kiln 混 Umber 58%
+  const ash = mix(hex(set.kiln), hex(set.umber), 0.58);
+  root.style.setProperty('--ash', '#' + ash.map(v => v.toString(16).padStart(2, '0')).join(''));
+}
+function chipSVG(id) {
+  const c = GLAZES[id][resolvedTheme()], edge = 'stroke="currentColor" stroke-opacity=".28" stroke-width="1"';
+  if (!c.b) return `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="${c.clay}" ${edge}/></svg>`;
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9.5" r="4.2" fill="${c.clay}" ${edge}/><circle cx="16" cy="9.5" r="4.2" fill="${c.b}" ${edge}/><circle cx="12" cy="16.5" r="3.4" fill="${c.accent}" ${edge}/></svg>`;
+}
+function renderChips() {
+  chips.innerHTML = GLAZE_IDS.map(id =>
+    `<button class="clay round" role="radio" data-glaze="${id}" aria-checked="${id === glaze}" aria-pressed="${id === glaze}" aria-label="${GLAZES[id].zh}" title="${GLAZES[id].zh} ${GLAZES[id].en}">${chipSVG(id)}</button>`).join('');
+  trayLabel.textContent = `${GLAZES[glaze].zh} · ${GLAZES[glaze].en}`;
+}
+function applyGlaze(g) {
+  glaze = g;
+  try { localStorage.setItem('dots-glaze', g); } catch (e) {}
+}
+function selectGlaze(g) { applyGlaze(g); retheme(); announce(`釉組：${GLAZES[g].zh}`); }
+function setTray(open) {
+  tray.classList.toggle('open', open);
+  glazeBtn.setAttribute('aria-expanded', String(open));
+  if (open) renderChips();
+}
+glazeBtn.addEventListener('click', () => setTray(!tray.classList.contains('open')));
+chips.addEventListener('click', e => { const b = e.target.closest('[data-glaze]'); if (b) selectGlaze(b.dataset.glaze); });
+addEventListener('pointerdown', e => { if (!e.target.closest('#tray, #glaze')) setTray(false); }, true);
+addEventListener('keydown', e => {
+  if (e.target === input) return;
+  if (e.key === 'Escape') setTray(false);
+  if (e.key === 'g' || e.key === 'G') selectGlaze(GLAZE_IDS[(GLAZE_IDS.indexOf(glaze) + 1) % GLAZE_IDS.length]);
+});
+const facesBtn = document.getElementById('faces');
+function setFaces(n, note = true) {
+  faceCount = n;
+  try { localStorage.setItem('dots-faces', String(n)); } catch (e) {}
+  assignFaces();
+  facesBtn.setAttribute('aria-label', `臉的數量：${n}`);
+  facesBtn.title = `臉的數量：${n}（F）`;
+  if (note) { labelNote = { text: n === 1 ? 'one face' : `${n} faces`, until: performance.now() + T.t5 }; announce(`${n} 張臉`); }
+}
+const nextFaces = () => setFaces(FACE_OPTIONS[(FACE_OPTIONS.indexOf(faceCount) + 1) % FACE_OPTIONS.length]);
+facesBtn.addEventListener('click', nextFaces);
+addEventListener('keydown', e => { if (e.target !== input && (e.key === 'f' || e.key === 'F')) nextFaces(); });
+const THEMES = ['auto', 'light', 'dark'];
+function applyTheme(t) {
+  if (t === 'auto') delete root.dataset.theme; else root.dataset.theme = t;
+  themeBtn.setAttribute('aria-label', `切換主題（目前：${{ auto: '自動', light: '亮色', dark: '暗色' }[t]}）`);
+  themeBtn.title = `主題：${{ auto: '自動', light: '亮色', dark: '暗色' }[t]}`;
+  document.getElementById('themeFill').setAttribute('d',
+    t === 'auto' ? 'M12 4.5a7.5 7.5 0 0 1 0 15z' : t === 'dark' ? 'M12 4.5a7.5 7.5 0 1 1 0 15a7.5 7.5 0 1 1 0-15z' : 'M12 12z');
+  retheme();
+}
+let themeIdx = THEMES.indexOf(qs.get('theme')); if (themeIdx < 0) themeIdx = 0;
+themeBtn.addEventListener('click', () => { themeIdx = (themeIdx + 1) % 3; applyTheme(THEMES[themeIdx]); });
+function retheme() { applyGlazeTokens(); readPalette(); buildSprites(); layoutClock(); buildBackground(); if (tray.classList.contains('open')) renderChips(); }
+mqDark.addEventListener('change', retheme);
+mqReduce.addEventListener('change', e => { reduced = e.matches; if (reduced) { well = null; ripple = null; breath = null; } });
+
+function resize() {
+  DPR = Math.min(2, devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  R = clamp(Math.min(W, H) * 0.06, 16, 64);
+  G = 2.1 * H;
+  layoutClock();
+  clock.hw.x = mode === 'alert' && !reduced ? 0 : clock.hwCap;
+  clock.cr.x = mode === 'alert' && !reduced ? clock.crCircle : clock.crCap;
+  syncDots();
+  if (mode === 'alert' || mode === 'down') assignRings();
+  buildBackground();
+}
+addEventListener('resize', resize);
+
+/* ════════════════════ 啟動 ════════════════════ */
+applyGlaze(glaze);
+applyGlazeTokens();
+readPalette();
+applyTheme(THEMES[themeIdx]);
+resize();
+setFaces(faceCount, false);
+if (reduced) { readObstacles(); for (let i = 0; i < 720; i++) step(FIXED_DT, 0); }   // 靜止狀態直接落定
+updateUI();
+const fontReady = document.fonts ? Promise.race([document.fonts.load(`400 ${FS.f6}px Fraunces`), new Promise(r => setTimeout(r, 1500))]) : Promise.resolve();
+fontReady.then(() => { layoutClock(); clock.hw.x = clock.hwCap; clock.cr.x = clock.crCap; if (qs.get('autostart') === '1') start(); });
+requestAnimationFrame(t => { last = t; frame(t); });
+window.__dots = { timer, get mode() { return mode; }, dots, start, pause, reset, setDuration };
+})();
+</script>
+</body>
+</html>
